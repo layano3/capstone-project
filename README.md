@@ -1,9 +1,17 @@
 # capstone-project
 
-Layan Omar 300249213
-Ibrahim Daoud 300186163
-Maisam Al-Nuaimi 300259259
-Youssef Mroue 300249960
+Layan Omar 300249213 Lomar018@uottawa.ca
+
+Ibrahim Daoud 300186163 idaou068@uottawa.ca
+
+Maisam Al-Nuaimi 300259259 Malnu061@uottawa.ca
+
+Youssef Mroue 300249960 ymrou065@uottawa.ca
+
+## Client:
+Johanne Seguin
+seguijoh@gmail.com
+
 
 # MathQuest Escape: Interactive Virtual Learning Environment
 
