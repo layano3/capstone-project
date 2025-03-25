@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3975f167b3fcb4f4789913eb34ec1835
+guid: a8af263c0b1378748a54eea7a5cd85c8
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,35 +110,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Back Button_0
+      name: "Captain\u2019s Log Button_0"
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 140
-        height: 67
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 41d1dae30354634499c579ee71ab5121
-      internalID: 544216462
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Back Button_1
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 140
-        height: 67
+        width: 157
+        height: 37
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -147,8 +125,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 27f28d6ae66ef324ebbb60d7e8f92d48
-      internalID: 1867428204
+      spriteID: dd343ffccff4c2d4b8c18b1a184894ee
+      internalID: -182915197
       vertices: []
       indices: 
       edges: []
@@ -157,7 +135,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 1ec6d5234c913204f90470677782f083
+    spriteID: 90a3a4d096b6ae64783f74ae534d900c
     internalID: 0
     vertices: []
     indices: 
@@ -167,8 +145,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Back Button_0: 544216462
-      Back Button_1: 1867428204
+      "Captain\u2019s Log Button_0": -182915197
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
