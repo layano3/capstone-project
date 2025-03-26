@@ -12,11 +12,11 @@ EditorBuildSettings:
     path: Assets/Scenes/GamePlay.unity
     guid: 7e972258699286c44835e601f84d4197
   - enabled: 1
-    path: Assets/Scenes/ProfileScene.unity
-    guid: 85e86eaebb0af144c95105374d75a10f
-  - enabled: 1
     path: Assets/Scenes/QuestsListScene.unity
     guid: 77787c1e4f8e90e4a8f9443acf177f32
+  - enabled: 1
+    path: Assets/Scenes/ProfileScene.unity
+    guid: 85e86eaebb0af144c95105374d75a10f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
