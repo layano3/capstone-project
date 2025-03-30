@@ -616,6 +616,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3600346891626154048, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: 067eed6340abfa94383b955a0cb27fad, type: 3}
+    - target: {fileID: 3600346891626154048, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: f01d358a8972eda47bb5c534f2200f7d, type: 2}
+    - target: {fileID: 4252921325042299611, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
+      propertyPath: drag
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4252921325042299611, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
+      propertyPath: runAcceleration
+      value: 35
+      objectReference: {fileID: 0}
+    - target: {fileID: 4252921325042299611, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
+      propertyPath: sprintAccelerataion
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784326658695935874, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
+      propertyPath: m_SkinWidth
+      value: 0.0001
+      objectReference: {fileID: 0}
     - target: {fileID: 4993132628614799920, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
