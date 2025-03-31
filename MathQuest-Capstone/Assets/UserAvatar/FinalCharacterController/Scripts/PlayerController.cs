@@ -22,6 +22,7 @@ namespace UserAvatar.FinalCharacterController
         public float inAirAcceleration = 25f;
         public float drag = 20f;
         public float gravity = 25f;
+        public float terminalVelocity = 50f;
         public float jumpSpeed = 1.0f;
         public float movingThreshold = 0.01f;
 
@@ -127,6 +128,11 @@ namespace UserAvatar.FinalCharacterController
             {
                 _verticalVelocity += _antiBump;
             }
+
+            if (Mathf.Abs(_verticalVelocity) > Mathf.Abs(terminalVelocity)){
+                _verticalVelocity = -1f * Mathf.Abs(terminalVelocity);
+            }
+                
         }
 
         private void HandleLateralMovement()
