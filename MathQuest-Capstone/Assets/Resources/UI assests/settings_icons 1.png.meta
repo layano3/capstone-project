@@ -1,0 +1,246 @@
+fileFormatVersion: 2
+guid: 935c0100566d60e4d93f40de47299db3
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5386265900654142596
+    second: Steampunk_UI_settings_icons_11
+  - first:
+      213: 3237128486507117460
+    second: Steampunk_UI_settings_icons_1
+  - first:
+      213: -9076074370141000563
+    second: Steampunk_UI_settings_icons_8
+  - first:
+      213: 3469631906650164528
+    second: Steampunk_UI_settings_icons_3
+  - first:
+      213: -4903740992919648390
+    second: Steampunk_UI_settings_icons_10
+  - first:
+      213: -7226955370430920533
+    second: Steampunk_UI_settings_icons_17
+  - first:
+      213: 7197031016943922643
+    second: Steampunk_UI_settings_icons_9
+  - first:
+      213: 3646414494465602808
+    second: Steampunk_UI_settings_icons_5
+  - first:
+      213: 9088428169153955142
+    second: Steampunk_UI_settings_icons_7
+  - first:
+      213: 6610079619929467713
+    second: Steampunk_UI_settings_icons_6
+  - first:
+      213: -4992558212496127271
+    second: Steampunk_UI_settings_icons_4
+  - first:
+      213: -6920055919511141656
+    second: Steampunk_UI_settings_icons_2
+  - first:
+      213: 3003066120967705153
+    second: Steampunk_UI_settings_icons_19
+  - first:
+      213: 113319994005644164
+    second: Steampunk_UI_settings_icons_13
+  - first:
+      213: 4011679678432824322
+    second: Steampunk_UI_settings_icons_16
+  - first:
+      213: -2328997052170742779
+    second: Steampunk_UI_settings_icons_18
+  - first:
+      213: -6150903190091209278
+    second: Steampunk_UI_settings_icons_0
+  - first:
+      213: 4591376285900042832
+    second: Steampunk_UI_settings_icons_12
+  - first:
+      213: 309978228193863311
+    second: Steampunk_UI_settings_icons_14
+  - first:
+      213: -7628538693589113814
+    second: Steampunk_UI_settings_icons_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 1
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: settings_icons 1_0
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 321
+        width: 186
+        height: 178
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 506fd07e965b0fe4590bfcc4e676d171
+      internalID: -1388099689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Steampunk_UI_settings_icons_0: -6150903190091209278
+      Steampunk_UI_settings_icons_1: 3237128486507117460
+      Steampunk_UI_settings_icons_10: -4903740992919648390
+      Steampunk_UI_settings_icons_11: 5386265900654142596
+      Steampunk_UI_settings_icons_12: 4591376285900042832
+      Steampunk_UI_settings_icons_13: 113319994005644164
+      Steampunk_UI_settings_icons_14: 309978228193863311
+      Steampunk_UI_settings_icons_15: -7628538693589113814
+      Steampunk_UI_settings_icons_16: 4011679678432824322
+      Steampunk_UI_settings_icons_17: -7226955370430920533
+      Steampunk_UI_settings_icons_18: -2328997052170742779
+      Steampunk_UI_settings_icons_19: 3003066120967705153
+      Steampunk_UI_settings_icons_2: -6920055919511141656
+      Steampunk_UI_settings_icons_3: 3469631906650164528
+      Steampunk_UI_settings_icons_4: -4992558212496127271
+      Steampunk_UI_settings_icons_5: 3646414494465602808
+      Steampunk_UI_settings_icons_6: 6610079619929467713
+      Steampunk_UI_settings_icons_7: 9088428169153955142
+      Steampunk_UI_settings_icons_8: -9076074370141000563
+      Steampunk_UI_settings_icons_9: 7197031016943922643
+      settings_icons 1_0: -1388099689
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

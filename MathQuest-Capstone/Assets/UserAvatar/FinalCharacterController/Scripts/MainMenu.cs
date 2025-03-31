@@ -25,6 +25,7 @@ public class MainMenu : MonoBehaviour
 
     public void LoadGame()
     {
+        AudioManager.Instance.StopMusic();
         SceneManager.LoadSceneAsync(1);
     }
 
