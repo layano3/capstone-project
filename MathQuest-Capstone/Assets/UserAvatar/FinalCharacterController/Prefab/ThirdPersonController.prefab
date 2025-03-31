@@ -9180,7 +9180,7 @@ GameObject:
   - component: {fileID: 948560010646594208}
   - component: {fileID: 4784326658695935874}
   - component: {fileID: 1326963639954541242}
-  - component: {fileID: 2373078522213680356}
+  - component: {fileID: 3276925822219459237}
   m_Layer: 0
   m_Name: ThirdPersonController
   m_TagString: Untagged
@@ -9276,6 +9276,7 @@ MonoBehaviour:
   runSpeed: 4
   sprintAcceleration: 50
   sprintSpeed: 7
+  inAirAcceleration: 25
   drag: 20
   gravity: 25
   jumpSpeed: 1
@@ -9285,6 +9286,9 @@ MonoBehaviour:
   lookSenseH: 0.1
   lookSenseV: 0.1
   lookLimitV: 75
+  _groundLayers:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &948560010646594208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9337,7 +9341,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animator: {fileID: 3600346891626154048}
   locomotionBlendSpeed: 4
---- !u!114 &2373078522213680356
+--- !u!114 &3276925822219459237
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
