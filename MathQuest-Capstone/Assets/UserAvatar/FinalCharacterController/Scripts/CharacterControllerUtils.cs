@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UserAvatar.FinalCharacterController
 {
-   public static class CharacterControllerUtils
+    public static class CharacterControllerUtils
     {
         public static Vector3 GetNormalWithSphereCast(CharacterController characterController, LayerMask layerMask = default)
         {

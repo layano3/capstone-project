@@ -13,6 +13,7 @@ namespace UserAvatar.FinalCharacterController
         private PlayerState _playerState;
         private PlayerController _playerController;
 
+        // Locomotion
         private static int inputXHash = Animator.StringToHash("inputX");
         private static int inputYHash = Animator.StringToHash("inputY");
         private static int inputMagnitudeHash = Animator.StringToHash("inputMagnitude");
@@ -20,18 +21,30 @@ namespace UserAvatar.FinalCharacterController
         private static int isGroundedHash = Animator.StringToHash("isGrounded");
         private static int isFallingHash = Animator.StringToHash("isFalling");
         private static int isJumpingHash = Animator.StringToHash("isJumping");
+
+        // Actions
+        private static int isAttackingHash = Animator.StringToHash("isAttacking");
+        private static int isGatheringHash = Animator.StringToHash("isGathering");
+        private static int isPlayingActionHash = Animator.StringToHash("isPlayingAction");
+        private int[] actionHashes;
+
+        // Camera/Rotation
         private static int isRotatingToTargetHash = Animator.StringToHash("isRotatingToTarget");
         private static int rotationMismatchHash = Animator.StringToHash("rotationMismatch");
 
         private Vector3 _currentBlendInput = Vector3.zero;
+
         private float _sprintMaxBlendValue = 1.5f;
-        private float _runMaxBlendValue = 1f;
+        private float _runMaxBlendValue = 1.0f;
         private float _walkMaxBlendValue = 0.5f;
+
         private void Awake()
         {
             _playerLocomotionInput = GetComponent<PlayerLocomotionInput>();
             _playerState = GetComponent<PlayerState>();
             _playerController = GetComponent<PlayerController>();
+
+            actionHashes = new int[] { isGatheringHash };
         }
 
         private void Update()
@@ -48,10 +61,11 @@ namespace UserAvatar.FinalCharacterController
             bool isFalling = _playerState.CurrentPlayerMovementState == PlayerMovementState.Falling;
             bool isGrounded = _playerState.InGroundedState();
 
-            bool isRunBlendvalue = isRunning || isJumping || isFalling;
+            bool isRunBlendValue = isRunning || isJumping || isFalling;
 
             Vector2 inputTarget = isSprinting ? _playerLocomotionInput.MovementInput * _sprintMaxBlendValue :
-                                  isRunning ? _playerLocomotionInput.MovementInput * _runMaxBlendValue : _playerLocomotionInput.MovementInput * _walkMaxBlendValue;
+                                  isRunBlendValue ? _playerLocomotionInput.MovementInput * _runMaxBlendValue : 
+                                                    _playerLocomotionInput.MovementInput * _walkMaxBlendValue;
 
             _currentBlendInput = Vector3.Lerp(_currentBlendInput, inputTarget, locomotionBlendSpeed * Time.deltaTime);
 
