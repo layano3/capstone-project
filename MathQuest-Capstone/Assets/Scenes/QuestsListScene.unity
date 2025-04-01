@@ -2139,7 +2139,7 @@ MonoBehaviour:
   questLossesTitleText: {fileID: 186432062}
   questLossesContentText: {fileID: 1084234115}
   nextButton: {fileID: 1423207245}
-  previousButton: {fileID: 2122216001}
+  previousButton: {fileID: 1679467509}
   quests:
   - questName: The Riddle of the Celestial Clock
     description: "The Mystic Marauder has entered a time-warped storm. To stabilize
