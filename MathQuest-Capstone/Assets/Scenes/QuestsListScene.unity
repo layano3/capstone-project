@@ -378,8 +378,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 276.5, y: -313.12}
-  m_SizeDelta: {x: 1700, y: 150}
+  m_AnchoredPosition: {x: 60.04, y: -313.12}
+  m_SizeDelta: {x: 1329.9204, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &186432062
 MonoBehaviour:
@@ -466,7 +466,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 265.72455, y: 0, z: 1230.26, w: 87.350464}
+  m_margin: {x: 265.72455, y: -0.000030517578, z: 795.81824, w: 87.350464}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -918,8 +918,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 305, y: -29}
-  m_SizeDelta: {x: 1700, y: 150}
+  m_AnchoredPosition: {x: -104.46, y: -29}
+  m_SizeDelta: {x: 881.07, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &915256155
 MonoBehaviour:
@@ -1014,7 +1014,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 249.42944, y: 0, z: 841.4763, w: 3.154602}
+  m_margin: {x: 249.42944, y: 0, z: 46.963257, w: 3.154602}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1258,8 +1258,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 334, y: -379}
-  m_SizeDelta: {x: 1700, y: 150}
+  m_AnchoredPosition: {x: 18.6276, y: -379}
+  m_SizeDelta: {x: 1069.2551, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1084234115
 MonoBehaviour:
@@ -1346,7 +1346,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 216.4646, y: 0, z: 1048.5972, w: 99.68411}
+  m_margin: {x: 216.4646, y: 0, z: 298.78308, w: 99.68411}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2101,6 +2101,80 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1423207243}
   m_CullTransparentMesh: 1
+--- !u!1 &1439930363
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1439930365}
+  - component: {fileID: 1439930364}
+  m_Layer: 0
+  m_Name: QuestManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1439930364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439930363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e94ce227c2bc1b49a4de9a68fa475f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questTitleText: {fileID: 382119686}
+  questDescText: {fileID: 1847569380}
+  questObjTitleText: {fileID: 1487811312}
+  questObjContentText: {fileID: 915256155}
+  questRewTitleText: {fileID: 1990316063}
+  questRewContentText: {fileID: 1772877198}
+  questLossesTitleText: {fileID: 186432062}
+  questLossesContentText: {fileID: 1084234115}
+  nextButton: {fileID: 1423207245}
+  previousButton: {fileID: 2122216001}
+  quests:
+  - questName: The Riddle of the Celestial Clock
+    description: "The Mystic Marauder has entered a time-warped storm. To stabilize
+      the ship\u2019s course, apprentices must activate the Celestial Clock using
+      ancient constellations. The only way to align the gears correctly is to solve
+      a series of math-based s"
+    objectives: 'Solve three sequential math puzzles involving: Fractions and star
+      positioning'
+    rewards: +50 XP +3 Gems
+    livesLost: ose 1 heart per failed puzzle attempt
+  - questName: te
+    description: te
+    objectives: te
+    rewards: te
+    livesLost: te
+  - questName: 12
+    description: 2
+    objectives: 12
+    rewards: 12
+    livesLost: 12
+--- !u!4 &1439930365
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1439930363}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1662.4205, y: 1448.8203, z: -35.82638}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1487811310
 GameObject:
   m_ObjectHideFlags: 0
@@ -2135,8 +2209,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 300, y: 31}
-  m_SizeDelta: {x: 1454.4395, y: 150}
+  m_AnchoredPosition: {x: 29.003296, y: 31}
+  m_SizeDelta: {x: 912.446, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1487811312
 MonoBehaviour:
@@ -2223,7 +2297,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 117.38025, y: 0, z: 1155.6094, w: 82.82526}
+  m_margin: {x: 117.38025, y: 0, z: 607.4569, w: 82.82526}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -3123,3 +3197,4 @@ SceneRoots:
   - {fileID: 1045896895}
   - {fileID: 235944521}
   - {fileID: 1295055310}
+  - {fileID: 1439930365}
