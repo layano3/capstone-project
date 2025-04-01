@@ -2,28 +2,33 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance;
 
-    // References to UI elements
-    public TextMeshProUGUI questTitleText;
-    public TextMeshProUGUI questDescText;
-    public TextMeshProUGUI questObjTitleText;
-    public TextMeshProUGUI questObjContentText;
-    public TextMeshProUGUI questRewTitleText;
-    public TextMeshProUGUI questRewContentText;
-    public TextMeshProUGUI questLossesTitleText;
-    public TextMeshProUGUI questLossesContentText;
+    [Header("Prefabs and Container")]
+    // A prefab for a quest panel. This prefab should be set up with child objects named:
+    // "QuestTitle", "QuestDesc", "QuestObjectives", "QuestRewards", "QuestLivesLost".
+    public GameObject questPanelPrefab;
+    // Parent container in the Canvas where quest panels will be instantiated.
+    public Transform panelContainer;
 
-    // Button references
+    [Header("Transition Component")]
+    public Quest3DTransition quest3DTransition;
+
+    [Header("Navigation Buttons")]
     public Button nextButton;
     public Button previousButton;
 
-    // Quest data array
+    [Header("Quest Data")]
     public Quest[] quests;
 
+    // List of instantiated quest panels (their RectTransforms)
+    private List<RectTransform> questPanels = new List<RectTransform>();
+
+    // The index of the currently visible quest panel
     private int currentQuestIndex = 0;
 
     private void Awake()
@@ -31,64 +36,104 @@ public class QuestManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);  // Prevents destruction when changing scenes
+            DontDestroyOnLoad(gameObject); // Persist across scenes.
         }
         else
         {
-            Destroy(gameObject);  // Ensures only one instance of QuestManager exists
+            Destroy(gameObject);
         }
     }
 
     private void Start()
     {
-        // Reset the quest index when the scene is loaded (in case it's not the first time)
-        if (SceneManager.GetActiveScene().name == "QuestListScene")
+        // Instantiate a quest panel for each Quest in the dataset.
+        // (Make sure your questPanelPrefab is not active in the scene if it's used as a template.)
+        foreach (Quest quest in quests)
         {
-            currentQuestIndex = 0;
+            GameObject panelObj = Instantiate(questPanelPrefab, panelContainer);
+            RectTransform panelRect = panelObj.GetComponent<RectTransform>();
+
+            // For the first panel, set it on-screen; for others, place them off-screen.
+            if (questPanels.Count == 0)
+            {
+                panelRect.localPosition = new Vector3(0f, -37f, 0f); // on-screen position
+            }
+            else
+            {
+                // Set other panels to the default incoming position for Next transitions.
+                panelRect.localPosition = new Vector3(400f, -37f, 200f);
+            }
+
+            panelObj.SetActive(true); // Ensure they are visible.
+            questPanels.Add(panelRect);
+
+            // Update panel UI with quest data.
+            UpdatePanelUI(panelRect, quest);
         }
 
-        // Set the UI to display the first quest
-        ShowQuest(currentQuestIndex);
+        // All panels remain active now. You can adjust their sibling order if needed.
+        // Optionally, bring the current panel to front:
+        questPanels[currentQuestIndex].SetAsLastSibling();
 
-        // Set up button listeners
-        nextButton.onClick.AddListener(ShowNextQuest);
-        previousButton.onClick.AddListener(ShowPreviousQuest);
+        // Set up button listeners.
+        nextButton.onClick.AddListener(AnimateToNextQuest);
+        previousButton.onClick.AddListener(AnimateToPreviousQuest);
     }
 
-    private void ShowQuest(int index)
+    // Updates the UI elements on a given panel with data from a Quest.
+    private void UpdatePanelUI(RectTransform panel, Quest quest)
     {
-        if (index < 0 || index >= quests.Length)
-            return;
+        TextMeshProUGUI title = panel.Find("QuestTitle").GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI desc = panel.Find("QuestDesc").GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI objectives = panel.Find("QuestObjectives").GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI rewards = panel.Find("QuestRewards").GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI livesLost = panel.Find("Losses").GetComponent<TextMeshProUGUI>();
 
-        Quest currentQuest = quests[index];
-
-        questTitleText.text = currentQuest.questName;
-        questDescText.text = currentQuest.description;
-        questObjTitleText.text = "Objectives";
-        questObjContentText.text = currentQuest.objectives;
-        questRewTitleText.text = "Rewards";
-        questRewContentText.text = currentQuest.rewards;
-        questLossesTitleText.text = "Lives Lost";
-        questLossesContentText.text = currentQuest.livesLost;
+        title.text = quest.questName;
+        desc.text = quest.description;
+        objectives.text = quest.objectives;
+        rewards.text = quest.rewards;
+        livesLost.text = quest.livesLost;
     }
-    private void ShowNextQuest()
+
+    // Called when the Next button is clicked.
+    private void AnimateToNextQuest()
     {
-        // Move to the next quest if possible
-        if (currentQuestIndex < quests.Length - 1)
+        if (currentQuestIndex < questPanels.Count - 1)
         {
-            currentQuestIndex++;
-            ShowQuest(currentQuestIndex);
+            int targetIndex = currentQuestIndex + 1;
+
+            // Ensure the target panel is active (it should be, since we instantiated all).
+            // Bring the target panel to front (optional: adjust sibling order for layering).
+            questPanels[targetIndex].SetAsLastSibling();
+
+            // Animate from the current panel to the target panel using the "Next" settings.
+            quest3DTransition.TransitionBetweenPanels(questPanels[currentQuestIndex], questPanels[targetIndex], true, () =>
+            {
+                // After the transition, update currentQuestIndex.
+                currentQuestIndex = targetIndex;
+                // Optionally, adjust the sibling order to bring current to the front.
+                questPanels[currentQuestIndex].SetAsLastSibling();
+            });
         }
     }
 
-    private void ShowPreviousQuest()
+    // Called when the Previous button is clicked.
+    private void AnimateToPreviousQuest()
     {
-        // Move to the previous quest if possible
         if (currentQuestIndex > 0)
         {
-            currentQuestIndex--;
-            ShowQuest(currentQuestIndex);
-        }
+            int targetIndex = currentQuestIndex - 1;
 
+            // Bring the target panel to front.
+            questPanels[targetIndex].SetAsLastSibling();
+
+            // Animate from the current panel to the target panel using the "Previous" settings.
+            quest3DTransition.TransitionBetweenPanels(questPanels[currentQuestIndex], questPanels[targetIndex], false, () =>
+            {
+                currentQuestIndex = targetIndex;
+                questPanels[currentQuestIndex].SetAsLastSibling();
+            });
+        }
     }
 }
