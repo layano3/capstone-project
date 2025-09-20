@@ -1,0 +1,18 @@
+# Control panel environment secrets
+control-panel/.env.local
+control-panel/.env*
+
+# Node and build artifacts
+control-panel/node_modules/
+control-panel/.next/
+control-panel/out/
+
+# Logs
+control-panel/npm-debug.log*
+control-panel/yarn-debug.log*
+control-panel/yarn-error.log*
+control-panel/pnpm-debug.log*
+control-panel/.pnpm-debug.log*
+
+# Misc
+.DS_Store
