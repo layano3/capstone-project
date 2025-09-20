@@ -121,7 +121,6 @@ export function StudentTable({
             {!loading && filtered.map((student) => {
               const progress = student.xpGoal > 0 ? Math.min(100, Math.round((student.xp / student.xpGoal) * 100)) : 0;
               const isSelected = selectedId === student.id;
-              const showAdjust = adjustingId === student.id;
               const isSaving = savingIds.has(student.id);
 
               return (

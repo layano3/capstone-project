@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { mapStudentRow } from "@/lib/mapStudent";
+import type { StudentUpdate, XpEventInsert } from "@/types/database";
 
 export async function POST(
   request: Request,
@@ -29,7 +30,7 @@ export async function POST(
     .from("students")
     .select("id, xp")
     .eq("id", studentId)
-    .single();
+    .single<{ id: string; xp: number }>();
 
   if (fetchError || !studentRow) {
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
@@ -41,15 +42,19 @@ export async function POST(
   const [{ error: updateError }, { error: logError }] = await Promise.all([
     supabaseAdmin
       .from("students")
-      .update({ xp: newXp, updated_at: timestamp })
+      // @ts-expect-error -- Supabase type helper mis-infers update payload as never in typed client
+      .update<StudentUpdate>({ xp: newXp, updated_at: timestamp })
       .eq("id", studentId),
-    supabaseAdmin.from("xp_events").insert({
-      student_id: studentId,
-      delta,
-      reason,
-      updated_by: updatedBy,
-      created_at: timestamp,
-    }),
+    supabaseAdmin
+      .from("xp_events")
+      // @ts-expect-error -- Supabase type helper mis-infers insert payload as never in typed client
+      .insert<XpEventInsert>({
+        student_id: studentId,
+        delta,
+        reason,
+        updated_by: updatedBy,
+        created_at: timestamp,
+      }),
   ]);
 
   if (updateError || logError) {
