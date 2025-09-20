@@ -2,9 +2,12 @@
   base = "control-panel"
   command = "pnpm build"
   publish = ".next"
+
 [functions]
   directory = "netlify/functions"
-[plugins]
+
+[[plugins]]
   package = "@netlify/plugin-nextjs"
+
 [build.environment]
   NODE_VERSION = "20"
