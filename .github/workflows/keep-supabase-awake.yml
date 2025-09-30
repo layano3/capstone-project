@@ -1,0 +1,43 @@
+name: Keep Supabase Awake
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Warm read-heavy endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          headers=(
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY"
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+            -H "Accept: application/json"
+            -H "Prefer: count=exact"
+          )
+          resources=(
+            "students?select=id,updated_at&order=updated_at.desc.nullslast&limit=1"
+            "xp_events?select=id,student_id,xp_change&order=created_at.desc&limit=1"
+          )
+          for resource in "${resources[@]}"; do
+            endpoint="$SUPABASE_URL/rest/v1/${resource}"
+            echo "\nRequesting: $endpoint"
+            status=$(curl -sS -o /tmp/resp.json -w "%{http_code}" "$endpoint" "${headers[@]}")
+            cat /tmp/resp.json
+            if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+              echo "Unexpected status code: $status for $resource"
+              exit 1
+            fi
+            if [[ ! -s /tmp/resp.json ]]; then
+              echo "Warning: response body empty for $resource"
+            fi
+            sleep 2
+          done
+          echo '\nSupabase keepalive run complete.'
