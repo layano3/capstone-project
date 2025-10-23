@@ -52,8 +52,6 @@ public class LoginController : MonoBehaviour
 
     IEnumerator LoginFlow()
     {
-        //_busy = true; SetInteractable(false); SetButton("Setting sail...");
-
         AuthSession session = null; string err = null;
         yield return SupabaseAuth.SignIn(supabaseConfig,
                                          usernameField.text.Trim(),
@@ -67,12 +65,18 @@ public class LoginController : MonoBehaviour
         }
 
         _accessToken = session.access_token;
-        _userId      = SupabaseAuth.GetUserIdFromJwt(_accessToken);
+        _userId = SupabaseAuth.GetUserIdFromJwt(_accessToken);
 
-        // (Optional) Example write/read to prove token works:
-        // yield return SupabaseRest.Insert(supabaseConfig, "scores",
-        //     "{\"value\":42,\"user_id\":\""+_userId+"\"}", _accessToken,
-        //     (e, r) => { if (e != null) Debug.LogError(e); else Debug.Log(r); });
+        if (!string.IsNullOrEmpty(_userId))
+        {
+            PlayerPrefs.SetString("CurrentUserId", _userId);
+            PlayerPrefs.Save();
+            Debug.Log($"Logged in! User ID saved: {_userId}");
+        }
+        else
+        {
+            Debug.LogWarning("Could not extract user ID from token.");
+        }
 
         SceneManager.LoadScene(nextSceneName);
     }
