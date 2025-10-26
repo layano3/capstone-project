@@ -1,13 +1,17 @@
 using UnityEngine;
+using Supabase;
 
-[CreateAssetMenu(fileName = "SupabaseConfig", menuName = "Config/Supabase")]
-public class SupabaseConfig : ScriptableObject
+namespace Supabase
 {
-    [Header("From Supabase Settings → API")]
-    public string url;    // e.g. https://xxxx.supabase.co
-    public string anonKey;
+    [CreateAssetMenu(fileName = "SupabaseConfig", menuName = "Config/Supabase")]
+    public class SupabaseConfig : ScriptableObject
+    {
+        [Header("From Supabase Settings → API")]
+        public string url;    // e.g. https://xxxx.supabase.co
+        public string anonKey;
 
-    [Header("Default paths (usually no change)")]
-    public string authPath = "/auth/v1";
-    public string restPath = "/rest/v1";
+        [Header("Default paths (usually no change)")]
+        public string authPath = "/auth/v1";
+        public string restPath = "/rest/v1";
+    }
 }
