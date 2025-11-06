@@ -9387,11 +9387,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46e796c385a6b534b80bedc8b175d32d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionSource: {fileID: 4993132628614799920}
-  interactRange: 3
+  interactionSource: {fileID: 5161790997652285822}
+  interactRange: 7
   hitMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  ignoreMask:
+    serializedVersion: 2
+    m_Bits: 0
+  showDebugRay: 0
+  debugRayColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &8129808808280461377
 MonoBehaviour:
   m_ObjectHideFlags: 0

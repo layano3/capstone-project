@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Core/Scenes/SettingScene.unity
     guid: 982283b0d180a4b458b4c1e2d77de647
+  - enabled: 1
+    path: Assets/Core/Scenes/BlackSmithEnv.unity
+    guid: fd569a44dd4ae504381e1c8a346bd568
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
