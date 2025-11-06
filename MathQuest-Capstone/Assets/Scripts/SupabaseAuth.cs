@@ -3,8 +3,10 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using Supabase;
 
-[Serializable] public class AuthSession
+namespace Supabase {
+    [Serializable] public class AuthSession
 {
     public string access_token;
     public string token_type;
@@ -60,4 +62,6 @@ public static class SupabaseAuth
         }
         catch { return null; }
     }
+}
+
 }
