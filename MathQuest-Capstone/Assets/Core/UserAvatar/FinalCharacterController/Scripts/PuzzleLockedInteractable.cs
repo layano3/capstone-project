@@ -19,6 +19,9 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     [Tooltip("If true, puzzle only needs to be solved once. If false, puzzle resets after each interaction.")]
     [SerializeField] private bool solveOnce = true;
     
+    [Tooltip("If true, interaction will be completely disabled after puzzle is solved. If false, user can still interact after solving.")]
+    [SerializeField] private bool disableInteractionAfterSolve = true;
+    
     [Tooltip("Allow manual unlock/lock via code or other triggers")]
     [SerializeField] private bool canBeManuallyUnlocked = true;
 
@@ -35,9 +38,18 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     [Tooltip("Optional: Invoke Unity Events when manually unlocked")]
     [SerializeField] private UnityEngine.Events.UnityEvent onManuallyUnlocked;
 
+    [Header("Rewards")]
+    [SerializeField] private bool awardXPOnSolve = false;
+    [SerializeField] private int xpRewardAmount = 25;
+    [SerializeField] private string xpRewardReason = "Puzzle solved";
+    [SerializeField] private bool awardXPOnlyOnce = true;
+    [SerializeField] private PlayerXPTracker xpTracker;
+
     private IPuzzle puzzle;
     private IInteractable wrappedInteractable;
     private bool hasBeenUnlocked = false;
+    private Collider[] interactableColliders; // Store colliders to disable them later
+    private bool xpAwarded = false;
 
     public bool IsLocked => isLocked && !hasBeenUnlocked;
     public bool HasBeenUnlocked => hasBeenUnlocked;
@@ -49,6 +61,26 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
         
         // Find the actual interactable we're wrapping
         SetupWrappedInteractable();
+        
+        // Cache colliders that the Interactor might raycast against
+        CacheInteractableColliders();
+
+        if (xpTracker == null && awardXPOnSolve)
+        {
+            xpTracker = FindObjectOfType<PlayerXPTracker>();
+        }
+    }
+
+    private void CacheInteractableColliders()
+    {
+        // Find all colliders on this GameObject and its children
+        // These are what the Interactor raycasts against
+        interactableColliders = GetComponentsInChildren<Collider>();
+        
+        if (showDebugMessages && interactableColliders.Length > 0)
+        {
+            Debug.Log($"PuzzleLockedInteractable on '{gameObject.name}': Found {interactableColliders.Length} collider(s) for interaction detection.");
+        }
     }
 
     private void SetupPuzzleReference()
@@ -125,10 +157,18 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
 
     /// <summary>
     /// Called when player interacts with this object.
-    /// If locked, shows puzzle. If unlocked, calls the wrapped interactable.
+    /// If locked, shows puzzle. If unlocked and interaction not disabled, calls the wrapped interactable.
     /// </summary>
     public void Interact()
     {
+        // If interaction is disabled after solve and puzzle is already solved, do nothing
+        if (disableInteractionAfterSolve && hasBeenUnlocked)
+        {
+            if (showDebugMessages)
+                Debug.Log($"{gameObject.name}: Interaction disabled - puzzle already solved.");
+            return;
+        }
+
         // If not locked or already unlocked, interact normally
         if (!isLocked || hasBeenUnlocked)
         {
@@ -181,9 +221,31 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
         
         // Invoke Unity Event
         onPuzzleCompleted?.Invoke();
+
+        AwardXPReward();
         
-        // Automatically interact with the wrapped object
+        // Automatically interact with the wrapped object (opens chest once)
         InteractWithWrappedObject();
+        
+        // If interaction should be disabled after solve, disable everything
+        if (disableInteractionAfterSolve)
+        {
+            if (showDebugMessages)
+                Debug.Log($"{gameObject.name}: Interaction disabled after puzzle completion.");
+            
+            // Disable this component so it no longer responds to interactions
+            enabled = false;
+            
+            // Also disable the wrapped interactable so the prompt doesn't show
+            if (wrappedInteractable != null && wrappedInteractable is MonoBehaviour)
+            {
+                (wrappedInteractable as MonoBehaviour).enabled = false;
+            }
+            
+            // Disable all colliders so the Interactor can't detect this object at all
+            // This prevents the "Press E" prompt from appearing
+            DisableInteractableColliders();
+        }
     }
 
     private void OnPuzzleCancelled()
@@ -225,6 +287,63 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
         // TODO: Integrate with your UI message system
     }
 
+    private void AwardXPReward()
+    {
+        if (!awardXPOnSolve)
+            return;
+
+        if (xpTracker == null)
+        {
+            if (showDebugMessages)
+                Debug.LogWarning($"{gameObject.name}: Cannot award XP - no PlayerXPTracker assigned.");
+            return;
+        }
+
+        if (awardXPOnlyOnce && xpAwarded)
+            return;
+
+        xpTracker.GrantXP(Mathf.Max(0, xpRewardAmount), string.IsNullOrEmpty(xpRewardReason) ? "Puzzle solved" : xpRewardReason);
+        xpAwarded = true;
+    }
+
+    private void DisableInteractableColliders()
+    {
+        if (interactableColliders != null && interactableColliders.Length > 0)
+        {
+            foreach (var collider in interactableColliders)
+            {
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
+            }
+            
+            if (showDebugMessages)
+            {
+                Debug.Log($"{gameObject.name}: Disabled {interactableColliders.Length} collider(s) - interaction prompt will no longer appear.");
+            }
+        }
+    }
+
+    private void EnableInteractableColliders()
+    {
+        if (interactableColliders != null && interactableColliders.Length > 0)
+        {
+            foreach (var collider in interactableColliders)
+            {
+                if (collider != null)
+                {
+                    collider.enabled = true;
+                }
+            }
+            
+            if (showDebugMessages)
+            {
+                Debug.Log($"{gameObject.name}: Re-enabled {interactableColliders.Length} collider(s).");
+            }
+        }
+    }
+
     // ===== PUBLIC API FOR EXTERNAL CONTROL =====
 
     /// <summary>
@@ -251,8 +370,19 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     public void Lock()
     {
         hasBeenUnlocked = false;
+        
+        // Re-enable components and colliders if they were disabled
+        enabled = true;
+        
+        if (wrappedInteractable != null && wrappedInteractable is MonoBehaviour)
+        {
+            (wrappedInteractable as MonoBehaviour).enabled = true;
+        }
+        
+        EnableInteractableColliders();
+        
         if (showDebugMessages)
-            Debug.Log($"{gameObject.name} locked.");
+            Debug.Log($"{gameObject.name} locked and re-enabled.");
     }
 
     /// <summary>
@@ -282,12 +412,28 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     public void ResetLock()
     {
         hasBeenUnlocked = false;
+        
+        // Re-enable components and colliders
+        enabled = true;
+        
+        if (wrappedInteractable != null && wrappedInteractable is MonoBehaviour)
+        {
+            (wrappedInteractable as MonoBehaviour).enabled = true;
+        }
+        
+        EnableInteractableColliders();
+        
         if (puzzle != null && !solveOnce)
         {
             puzzle.ResetPuzzle();
         }
+
+        if (!awardXPOnlyOnce)
+        {
+            xpAwarded = false;
+        }
         if (showDebugMessages)
-            Debug.Log($"{gameObject.name} lock reset.");
+            Debug.Log($"{gameObject.name} lock reset and re-enabled.");
     }
 
     // ===== EDITOR HELPERS =====

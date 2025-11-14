@@ -557,7 +557,7 @@ MonoBehaviour:
   interactionText: {fileID: 0}
   interactionIcon: {fileID: 0}
   promptPrefab: {fileID: 8626814924599422367, guid: 986e248b2874e3a4482e367091e0d8d4, type: 3}
-  usePrefabInstead: 1
+  usePrefabInstead: 0
   interactionKey: E
   interactionMessage: Press {0}
   fadeSpeed: 10
@@ -5492,6 +5492,7 @@ MonoBehaviour:
   isLocked: 1
   puzzleGameObject: {fileID: 1581078602}
   solveOnce: 1
+  disableInteractionAfterSolve: 1
   canBeManuallyUnlocked: 1
   lockedMessage: This is locked! Solve the puzzle to unlock it.
   unlockedMessage: Unlocked!
@@ -7717,6 +7718,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2061046607}
   - component: {fileID: 2061046606}
+  - component: {fileID: 2061046608}
   m_Layer: 0
   m_Name: InputManager
   m_TagString: Untagged
@@ -7751,6 +7753,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2061046608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061046605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5243f66ee8330874695869fd72963ea0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetCanvas: {fileID: 0}
+  xpProgressPrefab: {fileID: 1155123389936379740, guid: 638bb69d0acb9f241b4846c059c6d3d8, type: 3}
+  existingInstance: {fileID: 0}
+  bottomLeftOffset: {x: 48, y: 48}
+  sizeDelta: {x: 600, y: 120}
+  setupOnStart: 1
+  dontDestroyOnLoad: 0
+  forceNewCanvas: 1
 --- !u!1 &2068133324 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 735902402709320580, guid: fdc8fc6e42a289a41a47a11a9d9e4ece, type: 3}
