@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using NUnit.Framework;
 using UnityEngine;
 
@@ -245,4 +246,4 @@ namespace Tests
         }
     }
 }
-
+#endif

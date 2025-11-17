@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using System.Collections.Generic;
 using Supabase;
@@ -325,3 +326,4 @@ public class MiniTestRunner : MonoBehaviour
         results.Add($"❌ {name} failed: {reason}");
     }
 }
+#endif
