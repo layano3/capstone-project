@@ -117,6 +117,154 @@ public class PuzzleUISetup : MonoBehaviour
         Debug.Log("Assign this SimpleMathPuzzle component to your PuzzleLockedChest!");
     }
 
+    [ContextMenu("Create Multiple Choice Puzzle UI")]
+    public void CreateMultipleChoicePuzzleUI()
+    {
+        Debug.Log("Creating Multiple Choice Puzzle UI...");
+
+        Canvas mainCanvas = FindObjectOfType<Canvas>();
+        if (mainCanvas == null)
+        {
+            Debug.Log("No Canvas found. Creating one...");
+            mainCanvas = CreateMainCanvas();
+        }
+
+        GameObject puzzlePanel = new GameObject("MultipleChoicePuzzlePanel");
+        puzzlePanel.transform.SetParent(mainCanvas.transform, false);
+
+        RectTransform panelRect = puzzlePanel.AddComponent<RectTransform>();
+        panelRect.anchorMin = Vector2.zero;
+        panelRect.anchorMax = Vector2.one;
+        panelRect.offsetMin = Vector2.zero;
+        panelRect.offsetMax = Vector2.zero;
+
+        Image bgImage = puzzlePanel.AddComponent<Image>();
+        bgImage.color = new Color(0, 0, 0, 0.7f);
+
+        GameObject window = new GameObject("PuzzleWindow");
+        window.transform.SetParent(puzzlePanel.transform, false);
+
+        RectTransform windowRect = window.AddComponent<RectTransform>();
+        windowRect.anchorMin = new Vector2(0.5f, 0.5f);
+        windowRect.anchorMax = new Vector2(0.5f, 0.5f);
+        windowRect.sizeDelta = new Vector2(600, 520);
+        windowRect.anchoredPosition = Vector2.zero;
+
+        Image windowBg = window.AddComponent<Image>();
+        windowBg.color = new Color(0.2f, 0.2f, 0.2f, 0.95f);
+
+        GameObject titleObj = CreateText("Title", window.transform, "Choose the Correct Answer", 30, FontStyles.Bold);
+        RectTransform titleRect = titleObj.GetComponent<RectTransform>();
+        titleRect.anchorMin = new Vector2(0, 1);
+        titleRect.anchorMax = new Vector2(1, 1);
+        titleRect.sizeDelta = new Vector2(-40, 60);
+        titleRect.anchoredPosition = new Vector2(0, -30);
+
+        GameObject promptTextObj = CreateText("PromptText", window.transform, "Prompt goes here", 28, FontStyles.Bold);
+        RectTransform promptRect = promptTextObj.GetComponent<RectTransform>();
+        promptRect.anchorMin = new Vector2(0.5f, 0.75f);
+        promptRect.anchorMax = new Vector2(0.5f, 0.75f);
+        promptRect.sizeDelta = new Vector2(520, 120);
+        promptRect.anchoredPosition = new Vector2(0, 0);
+
+        GameObject promptImageObj = new GameObject("PromptImage");
+        promptImageObj.transform.SetParent(window.transform, false);
+        RectTransform promptImageRect = promptImageObj.AddComponent<RectTransform>();
+        promptImageRect.anchorMin = new Vector2(0.5f, 0.45f);
+        promptImageRect.anchorMax = new Vector2(0.5f, 0.45f);
+        promptImageRect.sizeDelta = new Vector2(360, 200);
+        promptImageRect.anchoredPosition = new Vector2(0, 20);
+
+        Image promptImage = promptImageObj.AddComponent<Image>();
+        promptImage.color = Color.white;
+        promptImage.preserveAspect = true;
+        promptImage.gameObject.SetActive(false);
+
+        GameObject optionsContainer = new GameObject("OptionsContainer");
+        optionsContainer.transform.SetParent(window.transform, false);
+        RectTransform optionsRect = optionsContainer.AddComponent<RectTransform>();
+        optionsRect.anchorMin = new Vector2(0.5f, 0);
+        optionsRect.anchorMax = new Vector2(0.5f, 0);
+        optionsRect.sizeDelta = new Vector2(520, 220);
+        optionsRect.anchoredPosition = new Vector2(0, -60);
+
+        VerticalLayoutGroup layoutGroup = optionsContainer.AddComponent<VerticalLayoutGroup>();
+        layoutGroup.spacing = 10;
+        layoutGroup.childControlHeight = true;
+        layoutGroup.childControlWidth = true;
+        layoutGroup.childForceExpandHeight = false;
+        layoutGroup.childForceExpandWidth = true;
+
+        ContentSizeFitter fitter = optionsContainer.AddComponent<ContentSizeFitter>();
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        const int optionCount = 4;
+        Button[] optionButtons = new Button[optionCount];
+        TextMeshProUGUI[] optionLabels = new TextMeshProUGUI[optionCount];
+
+        for (int i = 0; i < optionCount; i++)
+        {
+            GameObject optionObj = CreateButton($"Option{i + 1}", optionsContainer.transform, $"Option {i + 1}");
+            RectTransform optionRect = optionObj.GetComponent<RectTransform>();
+            optionRect.sizeDelta = new Vector2(0, 50);
+
+            LayoutElement layout = optionObj.AddComponent<LayoutElement>();
+            layout.preferredHeight = 50;
+            layout.flexibleWidth = 1f;
+
+            Button button = optionObj.GetComponent<Button>();
+            TextMeshProUGUI label = optionObj.GetComponentInChildren<TextMeshProUGUI>();
+            label.alignment = TextAlignmentOptions.Left;
+            label.margin = new Vector4(20, 10, 20, 10);
+
+            optionButtons[i] = button;
+            optionLabels[i] = label;
+        }
+
+        GameObject feedbackObj = CreateText("FeedbackText", window.transform, "", 22, FontStyles.Italic);
+        RectTransform feedbackRect = feedbackObj.GetComponent<RectTransform>();
+        feedbackRect.anchorMin = new Vector2(0.5f, 0);
+        feedbackRect.anchorMax = new Vector2(0.5f, 0);
+        feedbackRect.sizeDelta = new Vector2(520, 40);
+        feedbackRect.anchoredPosition = new Vector2(0, -220);
+
+        GameObject cancelBtn = CreateButton("CancelButton", window.transform, "Cancel");
+        RectTransform cancelRect = cancelBtn.GetComponent<RectTransform>();
+        cancelRect.anchorMin = new Vector2(0.5f, 0);
+        cancelRect.anchorMax = new Vector2(0.5f, 0);
+        cancelRect.sizeDelta = new Vector2(180, 42);
+        cancelRect.anchoredPosition = new Vector2(0, -270);
+
+        MultipleChoicePuzzle puzzleScript = puzzlePanel.AddComponent<MultipleChoicePuzzle>();
+        SetPrivateField(puzzleScript, "puzzlePanel", puzzlePanel);
+        SetPrivateField(puzzleScript, "promptText", promptTextObj.GetComponent<TextMeshProUGUI>());
+        SetPrivateField(puzzleScript, "promptImage", promptImage);
+        SetPrivateField(puzzleScript, "optionButtons", optionButtons);
+        SetPrivateField(puzzleScript, "optionLabels", optionLabels);
+        SetPrivateField(puzzleScript, "cancelButton", cancelBtn.GetComponent<Button>());
+        SetPrivateField(puzzleScript, "feedbackText", feedbackObj.GetComponent<TextMeshProUGUI>());
+
+        var sampleQuestion = new MultipleChoicePuzzle.MultipleChoiceQuestion
+        {
+            prompt = "Quel est le nombre qui continue cette suite : 2, 5, 10, 17, 26, ... ?",
+            promptImage = null,
+            options = new[]
+            {
+                new MultipleChoicePuzzle.ChoiceOption { label = "A) 30", isCorrect = false },
+                new MultipleChoicePuzzle.ChoiceOption { label = "B) 34", isCorrect = false },
+                new MultipleChoicePuzzle.ChoiceOption { label = "C) 35", isCorrect = false },
+                new MultipleChoicePuzzle.ChoiceOption { label = "D) 37", isCorrect = true },
+            }
+        };
+
+        SetPrivateField(puzzleScript, "questions", new[] { sampleQuestion });
+
+        puzzlePanel.SetActive(false);
+
+        Debug.Log("Multiple Choice Puzzle UI created successfully!");
+        Debug.Log("Assign this MultipleChoicePuzzle component to any PuzzleLockedInteractable to gate content.");
+    }
+
     private GameObject CreateText(string name, Transform parent, string text, int fontSize, FontStyles style)
     {
         GameObject textObj = new GameObject(name);

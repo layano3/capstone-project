@@ -8,6 +8,14 @@ using System;
 /// </summary>
 public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
 {
+    [Serializable]
+    private struct CustomQuestion
+    {
+        [TextArea]
+        public string prompt;
+        public int correctAnswer;
+    }
+
     [Header("UI References")]
     [SerializeField] private GameObject puzzlePanel;
     [SerializeField] private TextMeshProUGUI questionText;
@@ -21,11 +29,20 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
     [SerializeField] private int maxNumber = 20;
     [SerializeField] private bool allowSubtraction = true;
     [SerializeField] private bool allowMultiplication = false;
+    
+    [Header("Custom Question Set")]
+    [Tooltip("If enabled, the puzzle will use the questions below instead of generating random math problems.")]
+    [SerializeField] private bool useCustomQuestions = false;
+    [Tooltip("Optional list of predefined questions with their answers. Leave empty to keep using generated puzzles.")]
+    [SerializeField] private CustomQuestion[] customQuestions = Array.Empty<CustomQuestion>();
+    [Tooltip("If true, select a random custom question each time. If false, the list is used in order.")]
+    [SerializeField] private bool randomizeCustomQuestions = false;
 
     private int correctAnswer;
     private Action onCompleteCallback;
     private Action onCancelCallback;
     private bool isCompleted;
+    private int sequentialQuestionIndex;
 
     public bool IsActive => puzzlePanel != null && puzzlePanel.activeSelf;
     public bool IsCompleted => isCompleted;
@@ -80,6 +97,7 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
     {
         isCompleted = false;
         correctAnswer = 0;
+        sequentialQuestionIndex = 0;
         if (answerInput) answerInput.text = "";
         if (feedbackText) feedbackText.text = "";
         HidePuzzle();
@@ -87,6 +105,20 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
 
     private void GenerateQuestion()
     {
+        if (useCustomQuestions && customQuestions != null && customQuestions.Length > 0)
+        {
+            var questionData = GetNextCustomQuestion();
+            if (!string.IsNullOrWhiteSpace(questionData.prompt))
+            {
+                correctAnswer = questionData.correctAnswer;
+                if (questionText)
+                    questionText.text = questionData.prompt;
+                Debug.Log($"Loaded custom puzzle question: {questionData.prompt} (Answer: {correctAnswer})");
+                return;
+            }
+            Debug.LogWarning("SimpleMathPuzzle: Custom question had an empty prompt. Falling back to generated question.");
+        }
+
         int num1 = UnityEngine.Random.Range(minNumber, maxNumber + 1);
         int num2 = UnityEngine.Random.Range(minNumber, maxNumber + 1);
         
@@ -134,6 +166,24 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
             questionText.text = question;
 
         Debug.Log($"Generated puzzle: {question} (Answer: {correctAnswer})");
+    }
+
+    private CustomQuestion GetNextCustomQuestion()
+    {
+        if (customQuestions == null || customQuestions.Length == 0)
+        {
+            return default;
+        }
+
+        if (randomizeCustomQuestions)
+        {
+            int index = UnityEngine.Random.Range(0, customQuestions.Length);
+            return customQuestions[index];
+        }
+
+        var question = customQuestions[Mathf.Clamp(sequentialQuestionIndex, 0, customQuestions.Length - 1)];
+        sequentialQuestionIndex = (sequentialQuestionIndex + 1) % customQuestions.Length;
+        return question;
     }
 
     private void OnSubmitClicked()
