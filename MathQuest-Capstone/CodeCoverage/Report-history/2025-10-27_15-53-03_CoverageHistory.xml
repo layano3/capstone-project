@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2025-10-27_15-53-03" tag="">
+  <assembly name="Assembly-CSharp">
+    <class name="AudioManager" coveredlines="22" coverablelines="33" totallines="59" coveredbranches="0" totalbranches="0" />
+    <class name="Interactor" coveredlines="0" coverablelines="14" totallines="25" coveredbranches="0" totalbranches="0" />
+    <class name="MainMenu" coveredlines="21" coverablelines="27" totallines="48" coveredbranches="0" totalbranches="0" />
+    <class name="NumberGenerator" coveredlines="0" coverablelines="3" totallines="9" coveredbranches="0" totalbranches="0" />
+    <class name="Quest3DTransition" coveredlines="6" coverablelines="26" totallines="61" coveredbranches="0" totalbranches="0" />
+    <class name="QuestManager" coveredlines="14" coverablelines="68" totallines="139" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.CharacterControllerUtils" coveredlines="0" coverablelines="10" totallines="24" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.PlayerAnimation" coveredlines="11" coverablelines="46" totallines="84" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.PlayerController" coveredlines="0" coverablelines="172" totallines="292" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.PlayerInputManager" coveredlines="1" coverablelines="16" totallines="34" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.PlayerInteractInput" coveredlines="17" coverablelines="37" totallines="69" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.PlayerLocomotionInput" coveredlines="12" coverablelines="46" totallines="86" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.PlayerState" coveredlines="1" coverablelines="10" totallines="39" coveredbranches="0" totalbranches="0" />
+    <class name="UserAvatar.FinalCharacterController.ThirdPersonInput" coveredlines="0" coverablelines="35" totallines="76" coveredbranches="0" totalbranches="0" />
+    <class name="VolumeControl" coveredlines="0" coverablelines="8" totallines="24" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>
