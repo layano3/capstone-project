@@ -39,77 +39,128 @@ public class PuzzleUISetup : MonoBehaviour
         Image bgImage = puzzlePanel.AddComponent<Image>();
         bgImage.color = new Color(0, 0, 0, 0.7f);
 
-        // Create puzzle window
+        // Create responsive puzzle window
         GameObject window = new GameObject("PuzzleWindow");
         window.transform.SetParent(puzzlePanel.transform, false);
 
         RectTransform windowRect = window.AddComponent<RectTransform>();
         windowRect.anchorMin = new Vector2(0.5f, 0.5f);
         windowRect.anchorMax = new Vector2(0.5f, 0.5f);
-        windowRect.sizeDelta = new Vector2(400, 300);
+        windowRect.sizeDelta = new Vector2(450, 0); // Width fixed, height auto
         windowRect.anchoredPosition = Vector2.zero;
 
         Image windowBg = window.AddComponent<Image>();
         windowBg.color = new Color(0.2f, 0.2f, 0.2f, 0.95f);
 
-        // Create title
+        // Add VerticalLayoutGroup for responsive stacking
+        VerticalLayoutGroup windowLayout = window.AddComponent<VerticalLayoutGroup>();
+        windowLayout.spacing = 15;
+        windowLayout.padding = new RectOffset(30, 30, 20, 20);
+        windowLayout.childControlHeight = false;
+        windowLayout.childControlWidth = true;
+        windowLayout.childForceExpandHeight = false;
+        windowLayout.childForceExpandWidth = true;
+
+        // Add ContentSizeFitter so window auto-sizes
+        ContentSizeFitter windowFitter = window.AddComponent<ContentSizeFitter>();
+        windowFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        windowFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+        // Create title with auto-sizing
         GameObject titleObj = CreateText("Title", window.transform, "Solve the Puzzle", 32, FontStyles.Bold);
         RectTransform titleRect = titleObj.GetComponent<RectTransform>();
         titleRect.anchorMin = new Vector2(0, 1);
         titleRect.anchorMax = new Vector2(1, 1);
-        titleRect.sizeDelta = new Vector2(-40, 60);
-        titleRect.anchoredPosition = new Vector2(0, -30);
+        titleRect.pivot = new Vector2(0.5f, 1);
+        
+        LayoutElement titleLayout = titleObj.AddComponent<LayoutElement>();
+        titleLayout.preferredHeight = 50;
+        
+        ContentSizeFitter titleFitter = titleObj.AddComponent<ContentSizeFitter>();
+        titleFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        // Create question text
+        // Create question text with auto-sizing and word wrapping
         GameObject questionObj = CreateText("QuestionText", window.transform, "2 + 2 = ?", 36, FontStyles.Bold);
+        TextMeshProUGUI questionTMP = questionObj.GetComponent<TextMeshProUGUI>();
+        questionTMP.enableWordWrapping = true;
+        questionTMP.overflowMode = TextOverflowModes.Truncate;
+        
         RectTransform questionRect = questionObj.GetComponent<RectTransform>();
-        questionRect.anchorMin = new Vector2(0.5f, 0.5f);
-        questionRect.anchorMax = new Vector2(0.5f, 0.5f);
-        questionRect.sizeDelta = new Vector2(300, 80);
-        questionRect.anchoredPosition = new Vector2(0, 40);
+        questionRect.anchorMin = new Vector2(0, 1);
+        questionRect.anchorMax = new Vector2(1, 1);
+        questionRect.pivot = new Vector2(0.5f, 1);
+        
+        LayoutElement questionLayout = questionObj.AddComponent<LayoutElement>();
+        questionLayout.minHeight = 50;
+        questionLayout.flexibleHeight = 0;
+        
+        ContentSizeFitter questionFitter = questionObj.AddComponent<ContentSizeFitter>();
+        questionFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         // Create input field
         GameObject inputObj = CreateInputField("AnswerInput", window.transform);
         RectTransform inputRect = inputObj.GetComponent<RectTransform>();
-        inputRect.anchorMin = new Vector2(0.5f, 0.5f);
-        inputRect.anchorMax = new Vector2(0.5f, 0.5f);
-        inputRect.sizeDelta = new Vector2(200, 50);
-        inputRect.anchoredPosition = new Vector2(0, -20);
+        
+        LayoutElement inputLayout = inputObj.AddComponent<LayoutElement>();
+        inputLayout.preferredWidth = 250;
+        inputLayout.preferredHeight = 50;
+        inputLayout.flexibleWidth = 0;
+        inputLayout.flexibleHeight = 0;
 
-        // Create feedback text
+        // Create feedback text with auto-sizing
         GameObject feedbackObj = CreateText("FeedbackText", window.transform, "", 20, FontStyles.Normal);
+        TextMeshProUGUI feedbackTMP = feedbackObj.GetComponent<TextMeshProUGUI>();
+        feedbackTMP.enableWordWrapping = true;
+        
         RectTransform feedbackRect = feedbackObj.GetComponent<RectTransform>();
-        feedbackRect.anchorMin = new Vector2(0.5f, 0.5f);
-        feedbackRect.anchorMax = new Vector2(0.5f, 0.5f);
-        feedbackRect.sizeDelta = new Vector2(300, 40);
-        feedbackRect.anchoredPosition = new Vector2(0, -70);
+        
+        LayoutElement feedbackLayout = feedbackObj.AddComponent<LayoutElement>();
+        feedbackLayout.minHeight = 30;
+        feedbackLayout.flexibleHeight = 0;
+        
+        ContentSizeFitter feedbackFitter = feedbackObj.AddComponent<ContentSizeFitter>();
+        feedbackFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        // Create button container for horizontal layout
+        GameObject buttonContainer = new GameObject("ButtonContainer");
+        buttonContainer.transform.SetParent(window.transform, false);
+        
+        HorizontalLayoutGroup buttonLayout = buttonContainer.AddComponent<HorizontalLayoutGroup>();
+        buttonLayout.spacing = 15;
+        buttonLayout.childControlWidth = false;
+        buttonLayout.childControlHeight = false;
+        buttonLayout.childForceExpandWidth = false;
+        buttonLayout.childForceExpandHeight = false;
+        
+        LayoutElement buttonContainerLayout = buttonContainer.AddComponent<LayoutElement>();
+        buttonContainerLayout.flexibleHeight = 0;
 
         // Create submit button
-        GameObject submitBtn = CreateButton("SubmitButton", window.transform, "Submit");
-        RectTransform submitRect = submitBtn.GetComponent<RectTransform>();
-        submitRect.anchorMin = new Vector2(0.5f, 0);
-        submitRect.anchorMax = new Vector2(0.5f, 0);
-        submitRect.sizeDelta = new Vector2(150, 40);
-        submitRect.anchoredPosition = new Vector2(-80, 30);
+        GameObject submitBtn = CreateButton("SubmitButton", buttonContainer.transform, "Submit");
+        LayoutElement submitLayout = submitBtn.AddComponent<LayoutElement>();
+        submitLayout.preferredWidth = 150;
+        submitLayout.preferredHeight = 40;
+        submitLayout.flexibleWidth = 0;
+        submitLayout.flexibleHeight = 0;
 
         // Create cancel button
-        GameObject cancelBtn = CreateButton("CancelButton", window.transform, "Cancel");
-        RectTransform cancelRect = cancelBtn.GetComponent<RectTransform>();
-        cancelRect.anchorMin = new Vector2(0.5f, 0);
-        cancelRect.anchorMax = new Vector2(0.5f, 0);
-        cancelRect.sizeDelta = new Vector2(150, 40);
-        cancelRect.anchoredPosition = new Vector2(80, 30);
+        GameObject cancelBtn = CreateButton("CancelButton", buttonContainer.transform, "Cancel");
+        LayoutElement cancelLayout = cancelBtn.AddComponent<LayoutElement>();
+        cancelLayout.preferredWidth = 150;
+        cancelLayout.preferredHeight = 40;
+        cancelLayout.flexibleWidth = 0;
+        cancelLayout.flexibleHeight = 0;
 
         // Add SimpleMathPuzzle component
         SimpleMathPuzzle puzzleScript = puzzlePanel.AddComponent<SimpleMathPuzzle>();
 
         // Use reflection to set private fields
         SetPrivateField(puzzleScript, "puzzlePanel", puzzlePanel);
-        SetPrivateField(puzzleScript, "questionText", questionObj.GetComponent<TextMeshProUGUI>());
+        SetPrivateField(puzzleScript, "questionText", questionTMP);
         SetPrivateField(puzzleScript, "answerInput", inputObj.GetComponent<TMP_InputField>());
         SetPrivateField(puzzleScript, "submitButton", submitBtn.GetComponent<Button>());
         SetPrivateField(puzzleScript, "cancelButton", cancelBtn.GetComponent<Button>());
-        SetPrivateField(puzzleScript, "feedbackText", feedbackObj.GetComponent<TextMeshProUGUI>());
+        SetPrivateField(puzzleScript, "feedbackText", feedbackTMP);
 
         puzzlePanel.SetActive(false);
 
@@ -141,62 +192,101 @@ public class PuzzleUISetup : MonoBehaviour
         Image bgImage = puzzlePanel.AddComponent<Image>();
         bgImage.color = new Color(0, 0, 0, 0.7f);
 
+        // Create responsive window with VerticalLayoutGroup
         GameObject window = new GameObject("PuzzleWindow");
         window.transform.SetParent(puzzlePanel.transform, false);
 
         RectTransform windowRect = window.AddComponent<RectTransform>();
         windowRect.anchorMin = new Vector2(0.5f, 0.5f);
         windowRect.anchorMax = new Vector2(0.5f, 0.5f);
-        windowRect.sizeDelta = new Vector2(600, 520);
+        windowRect.sizeDelta = new Vector2(600, 0); // Width fixed, height auto
         windowRect.anchoredPosition = Vector2.zero;
 
         Image windowBg = window.AddComponent<Image>();
         windowBg.color = new Color(0.2f, 0.2f, 0.2f, 0.95f);
 
+        // Add VerticalLayoutGroup to window for responsive stacking
+        VerticalLayoutGroup windowLayout = window.AddComponent<VerticalLayoutGroup>();
+        windowLayout.spacing = 15;
+        windowLayout.padding = new RectOffset(30, 30, 20, 20);
+        windowLayout.childControlHeight = false;
+        windowLayout.childControlWidth = true;
+        windowLayout.childForceExpandHeight = false;
+        windowLayout.childForceExpandWidth = true;
+
+        // Add ContentSizeFitter to window so it auto-sizes based on content
+        ContentSizeFitter windowFitter = window.AddComponent<ContentSizeFitter>();
+        windowFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        windowFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+
+        // Create title with auto-sizing
         GameObject titleObj = CreateText("Title", window.transform, "Choose the Correct Answer", 30, FontStyles.Bold);
         RectTransform titleRect = titleObj.GetComponent<RectTransform>();
         titleRect.anchorMin = new Vector2(0, 1);
         titleRect.anchorMax = new Vector2(1, 1);
-        titleRect.sizeDelta = new Vector2(-40, 60);
-        titleRect.anchoredPosition = new Vector2(0, -30);
+        titleRect.pivot = new Vector2(0.5f, 1);
+        
+        LayoutElement titleLayout = titleObj.AddComponent<LayoutElement>();
+        titleLayout.preferredHeight = 50;
+        
+        ContentSizeFitter titleFitter = titleObj.AddComponent<ContentSizeFitter>();
+        titleFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
+        // Create prompt text container with auto-sizing
         GameObject promptTextObj = CreateText("PromptText", window.transform, "Prompt goes here", 28, FontStyles.Bold);
+        TextMeshProUGUI promptTMP = promptTextObj.GetComponent<TextMeshProUGUI>();
+        promptTMP.enableWordWrapping = true;
+        promptTMP.overflowMode = TextOverflowModes.Truncate;
+        
         RectTransform promptRect = promptTextObj.GetComponent<RectTransform>();
-        promptRect.anchorMin = new Vector2(0.5f, 0.75f);
-        promptRect.anchorMax = new Vector2(0.5f, 0.75f);
-        promptRect.sizeDelta = new Vector2(520, 120);
-        promptRect.anchoredPosition = new Vector2(0, 0);
+        promptRect.anchorMin = new Vector2(0, 1);
+        promptRect.anchorMax = new Vector2(1, 1);
+        promptRect.pivot = new Vector2(0.5f, 1);
+        
+        LayoutElement promptLayout = promptTextObj.AddComponent<LayoutElement>();
+        promptLayout.minHeight = 40;
+        promptLayout.flexibleHeight = 0;
+        
+        ContentSizeFitter promptFitter = promptTextObj.AddComponent<ContentSizeFitter>();
+        promptFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
+        // Create prompt image container (auto-hides when no image)
         GameObject promptImageObj = new GameObject("PromptImage");
         promptImageObj.transform.SetParent(window.transform, false);
         RectTransform promptImageRect = promptImageObj.AddComponent<RectTransform>();
-        promptImageRect.anchorMin = new Vector2(0.5f, 0.45f);
-        promptImageRect.anchorMax = new Vector2(0.5f, 0.45f);
-        promptImageRect.sizeDelta = new Vector2(360, 200);
-        promptImageRect.anchoredPosition = new Vector2(0, 20);
+        promptImageRect.anchorMin = new Vector2(0.5f, 0.5f);
+        promptImageRect.anchorMax = new Vector2(0.5f, 0.5f);
+        promptImageRect.pivot = new Vector2(0.5f, 0.5f);
 
         Image promptImage = promptImageObj.AddComponent<Image>();
         promptImage.color = Color.white;
         promptImage.preserveAspect = true;
         promptImage.gameObject.SetActive(false);
 
+        LayoutElement imageLayout = promptImageObj.AddComponent<LayoutElement>();
+        imageLayout.preferredWidth = 540;
+        imageLayout.preferredHeight = 300;
+        imageLayout.flexibleWidth = 0;
+        imageLayout.flexibleHeight = 0;
+        imageLayout.ignoreLayout = false; // Will be toggled based on image presence
+
+        // Create options container with auto-sizing
         GameObject optionsContainer = new GameObject("OptionsContainer");
         optionsContainer.transform.SetParent(window.transform, false);
         RectTransform optionsRect = optionsContainer.AddComponent<RectTransform>();
-        optionsRect.anchorMin = new Vector2(0.5f, 0);
-        optionsRect.anchorMax = new Vector2(0.5f, 0);
-        optionsRect.sizeDelta = new Vector2(520, 220);
-        optionsRect.anchoredPosition = new Vector2(0, -60);
 
-        VerticalLayoutGroup layoutGroup = optionsContainer.AddComponent<VerticalLayoutGroup>();
-        layoutGroup.spacing = 10;
-        layoutGroup.childControlHeight = true;
-        layoutGroup.childControlWidth = true;
-        layoutGroup.childForceExpandHeight = false;
-        layoutGroup.childForceExpandWidth = true;
+        VerticalLayoutGroup optionsLayout = optionsContainer.AddComponent<VerticalLayoutGroup>();
+        optionsLayout.spacing = 10;
+        optionsLayout.childControlHeight = false;
+        optionsLayout.childControlWidth = true;
+        optionsLayout.childForceExpandHeight = false;
+        optionsLayout.childForceExpandWidth = true;
 
-        ContentSizeFitter fitter = optionsContainer.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        ContentSizeFitter optionsFitter = optionsContainer.AddComponent<ContentSizeFitter>();
+        optionsFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        LayoutElement optionsLayoutElement = optionsContainer.AddComponent<LayoutElement>();
+        optionsLayoutElement.flexibleHeight = 0;
 
         const int optionCount = 4;
         Button[] optionButtons = new Button[optionCount];
@@ -205,44 +295,57 @@ public class PuzzleUISetup : MonoBehaviour
         for (int i = 0; i < optionCount; i++)
         {
             GameObject optionObj = CreateButton($"Option{i + 1}", optionsContainer.transform, $"Option {i + 1}");
-            RectTransform optionRect = optionObj.GetComponent<RectTransform>();
-            optionRect.sizeDelta = new Vector2(0, 50);
-
-            LayoutElement layout = optionObj.AddComponent<LayoutElement>();
-            layout.preferredHeight = 50;
-            layout.flexibleWidth = 1f;
-
             Button button = optionObj.GetComponent<Button>();
             TextMeshProUGUI label = optionObj.GetComponentInChildren<TextMeshProUGUI>();
             label.alignment = TextAlignmentOptions.Left;
             label.margin = new Vector4(20, 10, 20, 10);
+            label.enableWordWrapping = true;
+            label.overflowMode = TextOverflowModes.Truncate;
+
+            LayoutElement optionLayout = optionObj.AddComponent<LayoutElement>();
+            optionLayout.minHeight = 50;
+            optionLayout.flexibleHeight = 0;
+            optionLayout.flexibleWidth = 1f;
+
+            ContentSizeFitter optionFitter = optionObj.AddComponent<ContentSizeFitter>();
+            optionFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             optionButtons[i] = button;
             optionLabels[i] = label;
         }
 
+        // Create feedback text with auto-sizing
         GameObject feedbackObj = CreateText("FeedbackText", window.transform, "", 22, FontStyles.Italic);
+        TextMeshProUGUI feedbackTMP = feedbackObj.GetComponent<TextMeshProUGUI>();
+        feedbackTMP.enableWordWrapping = true;
+        
         RectTransform feedbackRect = feedbackObj.GetComponent<RectTransform>();
-        feedbackRect.anchorMin = new Vector2(0.5f, 0);
-        feedbackRect.anchorMax = new Vector2(0.5f, 0);
-        feedbackRect.sizeDelta = new Vector2(520, 40);
-        feedbackRect.anchoredPosition = new Vector2(0, -220);
+        
+        LayoutElement feedbackLayout = feedbackObj.AddComponent<LayoutElement>();
+        feedbackLayout.minHeight = 30;
+        feedbackLayout.flexibleHeight = 0;
+        
+        ContentSizeFitter feedbackFitter = feedbackObj.AddComponent<ContentSizeFitter>();
+        feedbackFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
+        // Create cancel button
         GameObject cancelBtn = CreateButton("CancelButton", window.transform, "Cancel");
         RectTransform cancelRect = cancelBtn.GetComponent<RectTransform>();
-        cancelRect.anchorMin = new Vector2(0.5f, 0);
-        cancelRect.anchorMax = new Vector2(0.5f, 0);
-        cancelRect.sizeDelta = new Vector2(180, 42);
-        cancelRect.anchoredPosition = new Vector2(0, -270);
+        
+        LayoutElement cancelLayout = cancelBtn.AddComponent<LayoutElement>();
+        cancelLayout.preferredWidth = 180;
+        cancelLayout.preferredHeight = 42;
+        cancelLayout.flexibleWidth = 0;
+        cancelLayout.flexibleHeight = 0;
 
         MultipleChoicePuzzle puzzleScript = puzzlePanel.AddComponent<MultipleChoicePuzzle>();
         SetPrivateField(puzzleScript, "puzzlePanel", puzzlePanel);
-        SetPrivateField(puzzleScript, "promptText", promptTextObj.GetComponent<TextMeshProUGUI>());
+        SetPrivateField(puzzleScript, "promptText", promptTMP);
         SetPrivateField(puzzleScript, "promptImage", promptImage);
         SetPrivateField(puzzleScript, "optionButtons", optionButtons);
         SetPrivateField(puzzleScript, "optionLabels", optionLabels);
         SetPrivateField(puzzleScript, "cancelButton", cancelBtn.GetComponent<Button>());
-        SetPrivateField(puzzleScript, "feedbackText", feedbackObj.GetComponent<TextMeshProUGUI>());
+        SetPrivateField(puzzleScript, "feedbackText", feedbackTMP);
 
         var sampleQuestion = new MultipleChoicePuzzle.MultipleChoiceQuestion
         {

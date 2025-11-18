@@ -146,6 +146,13 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
             bool hasImage = question.promptImage != null;
             promptImage.gameObject.SetActive(hasImage);
             promptImage.sprite = question.promptImage;
+            
+            // Update LayoutElement to ignore layout when no image
+            LayoutElement imageLayout = promptImage.GetComponent<LayoutElement>();
+            if (imageLayout != null)
+            {
+                imageLayout.ignoreLayout = !hasImage;
+            }
         }
 
         activeOptions.Clear();
