@@ -116,6 +116,12 @@ public class Interactor : MonoBehaviour
     {
         if (!interactionSource) return false;
 
+        // Block interaction if any puzzle is currently active
+        if (PuzzleHelper.IsAnyPuzzleActive())
+        {
+            return false;
+        }
+
         // Prefer the hovered target if it exists and is still valid
         if (CurrentTarget != null)
         {

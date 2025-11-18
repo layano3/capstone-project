@@ -50,6 +50,7 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     private bool hasBeenUnlocked = false;
     private Collider[] interactableColliders; // Store colliders to disable them later
     private bool xpAwarded = false;
+    private int myQuestionIndex = 0; // Track which question this interactable is on
 
     public bool IsLocked => isLocked && !hasBeenUnlocked;
     public bool HasBeenUnlocked => hasBeenUnlocked;
@@ -192,17 +193,27 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
             return;
         }
 
-        // Check if puzzle was already completed (and we're in solveOnce mode)
-        if (solveOnce && puzzle.IsCompleted)
+        // If puzzle is already active (from another interactable), don't show it again
+        if (puzzle.IsActive)
         {
-            OnPuzzleCompleted();
+            if (showDebugMessages)
+                Debug.Log($"{gameObject.name}: Puzzle is already active from another interactable. Waiting...");
             return;
         }
 
-        // Reset puzzle if not in solveOnce mode
-        if (!solveOnce && puzzle.IsCompleted)
+        // Pass our question index to the puzzle FIRST, before resetting
+        // This ensures the puzzle knows which question to show for this interactable
+        SetPuzzleQuestionIndex(myQuestionIndex);
+
+        // Reset puzzle completion state when showing for this interactable
+        // This ensures each interactable gets a fresh puzzle, even if they share the same puzzle instance
+        // Note: We set the index before resetting, so ResetPuzzle won't override it
+        if (puzzle.IsCompleted)
         {
+            // Temporarily store the index, reset, then restore it
+            int savedIndex = myQuestionIndex;
             puzzle.ResetPuzzle();
+            SetPuzzleQuestionIndex(savedIndex);
         }
 
         puzzle.ShowPuzzle(
@@ -211,12 +222,43 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
         );
     }
 
+    private void SetPuzzleQuestionIndex(int index)
+    {
+        // Use reflection to set the question index on the puzzle
+        // This works for both SimpleMathPuzzle and MultipleChoicePuzzle
+        var puzzleType = puzzle.GetType();
+        var field = puzzleType.GetField("sequentialQuestionIndex", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        
+        if (field != null)
+        {
+            field.SetValue(puzzle, index);
+        }
+        else
+        {
+            // Try alternative field name for custom questions
+            field = puzzleType.GetField("sequentialCustomQuestionIndex",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field != null)
+            {
+                field.SetValue(puzzle, index);
+            }
+        }
+    }
+
     private void OnPuzzleCompleted()
     {
         if (showDebugMessages)
             Debug.Log($"Puzzle completed! {gameObject.name} is now unlocked.");
         
         hasBeenUnlocked = true;
+        
+        // Advance to next question for this interactable
+        if (!solveOnce)
+        {
+            myQuestionIndex++;
+        }
+        
         ShowUnlockedMessage();
         
         // Invoke Unity Event
@@ -412,6 +454,7 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     public void ResetLock()
     {
         hasBeenUnlocked = false;
+        myQuestionIndex = 0; // Reset question index
         
         // Re-enable components and colliders
         enabled = true;

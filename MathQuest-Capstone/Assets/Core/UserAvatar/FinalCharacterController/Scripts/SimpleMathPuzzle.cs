@@ -181,8 +181,21 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
             return customQuestions[index];
         }
 
-        var question = customQuestions[Mathf.Clamp(sequentialQuestionIndex, 0, customQuestions.Length - 1)];
-        sequentialQuestionIndex = (sequentialQuestionIndex + 1) % customQuestions.Length;
+        // Clamp index to valid range
+        int clampedIndex = Mathf.Clamp(sequentialQuestionIndex, 0, customQuestions.Length - 1);
+        var question = customQuestions[clampedIndex];
+        
+        // Only advance index if we're not at the end (to allow cycling)
+        if (sequentialQuestionIndex < customQuestions.Length - 1)
+        {
+            sequentialQuestionIndex++;
+        }
+        else
+        {
+            // Wrap around to beginning
+            sequentialQuestionIndex = 0;
+        }
+        
         return question;
     }
 

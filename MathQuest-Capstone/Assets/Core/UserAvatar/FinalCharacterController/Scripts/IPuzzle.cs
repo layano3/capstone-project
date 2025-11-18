@@ -34,3 +34,23 @@ public interface IPuzzle
     void ResetPuzzle();
 }
 
+/// <summary>
+/// Helper class to check puzzle state across the scene.
+/// </summary>
+public static class PuzzleHelper
+{
+    /// <summary>
+    /// Check if any puzzle is currently active in the scene.
+    /// </summary>
+    public static bool IsAnyPuzzleActive()
+    {
+        var puzzles = UnityEngine.Object.FindObjectsOfType<MonoBehaviour>();
+        foreach (var puzzle in puzzles)
+        {
+            if (puzzle is IPuzzle ip && ip.IsActive)
+                return true;
+        }
+        return false;
+    }
+}
+

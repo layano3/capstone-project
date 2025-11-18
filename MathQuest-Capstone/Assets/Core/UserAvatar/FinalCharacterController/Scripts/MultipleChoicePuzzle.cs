@@ -118,8 +118,21 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
             return questions[randomIndex];
         }
 
-        var question = questions[Mathf.Clamp(sequentialQuestionIndex, 0, questions.Length - 1)];
-        sequentialQuestionIndex = (sequentialQuestionIndex + 1) % questions.Length;
+        // Clamp index to valid range
+        int clampedIndex = Mathf.Clamp(sequentialQuestionIndex, 0, questions.Length - 1);
+        var question = questions[clampedIndex];
+        
+        // Only advance index if we're not at the end (to allow cycling)
+        if (sequentialQuestionIndex < questions.Length - 1)
+        {
+            sequentialQuestionIndex++;
+        }
+        else
+        {
+            // Wrap around to beginning
+            sequentialQuestionIndex = 0;
+        }
+        
         return question;
     }
 

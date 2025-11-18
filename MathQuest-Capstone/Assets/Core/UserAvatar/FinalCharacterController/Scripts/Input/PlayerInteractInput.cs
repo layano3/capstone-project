@@ -41,8 +41,12 @@ namespace UserAvatar.FinalCharacterController
 
         private void Update()
         {
-            if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-                _interactor?.TryInteract();
+            // Block E input if any puzzle is active
+            if (!PuzzleHelper.IsAnyPuzzleActive())
+            {
+                if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+                    _interactor?.TryInteract();
+            }
 
             if (_playerLocomotionInput != null && _playerLocomotionInput.MovementInput != Vector2.zero)
                 GatherPressed = false;
@@ -50,7 +54,7 @@ namespace UserAvatar.FinalCharacterController
 
         public void OnInteract(InputAction.CallbackContext ctx)
         {
-            if (ctx.performed)
+            if (ctx.performed && !PuzzleHelper.IsAnyPuzzleActive())
                 _interactor?.TryInteract();
         }
 
