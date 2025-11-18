@@ -14,6 +14,12 @@ public class ChestAnimationInteractable : MonoBehaviour, IInteractable
     [SerializeField] float cooldown = 0.25f;
     [SerializeField] float crossFade = 0.1f;
 
+    [Header("Audio (Optional)")]
+    [SerializeField] private AudioClip openSound;
+    [SerializeField] private AudioClip closeSound;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private bool useAudioManager = true;
+
     bool opened;
     float lastUse;
 
@@ -28,6 +34,9 @@ public class ChestAnimationInteractable : MonoBehaviour, IInteractable
 
         SetWrap(openClip);
         SetWrap(closeClip);
+        
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     void AddClipIfNeeded(AnimationClip clip)
@@ -53,11 +62,13 @@ public class ChestAnimationInteractable : MonoBehaviour, IInteractable
         {
             Play(closeClip.name);
             opened = false;
+            PlayChestSound(closeSound);
         }
         else
         {
             Play(openClip.name);
             opened = true;
+            PlayChestSound(openSound);
         }
     }
 
@@ -68,5 +79,19 @@ public class ChestAnimationInteractable : MonoBehaviour, IInteractable
         SetWrap(closeClip);
         if (crossFade > 0f && anim.isPlaying) anim.CrossFade(name, crossFade);
         else anim.Play(name);
+    }
+    
+    private void PlayChestSound(AudioClip clip)
+    {
+        if (clip == null) return;
+        
+        if (useAudioManager && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFXOneShot(clip, transform.position, 0.8f);
+        }
+        else if (audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
     }
 }

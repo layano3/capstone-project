@@ -16,6 +16,7 @@ public class DoorInteractable : MonoBehaviour, IInteractable
     [SerializeField] private AudioClip openSound;
     [SerializeField] private AudioClip closeSound;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private bool useAudioManager = true;
 
     private Quaternion targetRotation;
     private bool isAnimating = false;
@@ -44,8 +45,18 @@ public class DoorInteractable : MonoBehaviour, IInteractable
         targetRotation = Quaternion.Euler(0, openAngle, 0);
         isAnimating = true;
         
-        if (audioSource && openSound)
-            audioSource.PlayOneShot(openSound);
+        // Play sound
+        if (openSound != null)
+        {
+            if (useAudioManager && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFXOneShot(openSound, transform.position, 0.8f);
+            }
+            else if (audioSource != null)
+            {
+                audioSource.PlayOneShot(openSound);
+            }
+        }
         
         Debug.Log($"{gameObject.name}: Door opening");
     }
@@ -55,8 +66,18 @@ public class DoorInteractable : MonoBehaviour, IInteractable
         targetRotation = Quaternion.Euler(0, closeAngle, 0);
         isAnimating = true;
         
-        if (audioSource && closeSound)
-            audioSource.PlayOneShot(closeSound);
+        // Play sound
+        if (closeSound != null)
+        {
+            if (useAudioManager && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFXOneShot(closeSound, transform.position, 0.8f);
+            }
+            else if (audioSource != null)
+            {
+                audioSource.PlayOneShot(closeSound);
+            }
+        }
         
         Debug.Log($"{gameObject.name}: Door closing");
     }

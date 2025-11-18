@@ -44,6 +44,12 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     [SerializeField] private string xpRewardReason = "Puzzle solved";
     [SerializeField] private bool awardXPOnlyOnce = true;
     [SerializeField] private PlayerXPTracker xpTracker;
+    
+    [Header("Audio (Optional)")]
+    [SerializeField] private AudioClip xpGainSound;
+    [SerializeField] private AudioClip puzzleSolvedSound;
+    [SerializeField] private bool useAudioManager = true;
+    [SerializeField] private bool playSounds = true;
 
     private IPuzzle puzzle;
     private IInteractable wrappedInteractable;
@@ -311,6 +317,35 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
 
         xpTracker.GrantXP(Mathf.Max(0, xpRewardAmount), string.IsNullOrEmpty(xpRewardReason) ? "Puzzle solved" : xpRewardReason);
         xpAwarded = true;
+        
+        // Play sound effect
+        PlayXPSound();
+    }
+    
+    private void PlayXPSound()
+    {
+        if (!playSounds) return;
+        
+        // Prefer puzzle solved sound if available, otherwise use generic XP sound
+        AudioClip soundToPlay = puzzleSolvedSound != null ? puzzleSolvedSound : xpGainSound;
+        
+        if (soundToPlay == null) return;
+        
+        Vector3 position = transform.position;
+        
+        if (useAudioManager && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFXOneShot(soundToPlay, position, 0.7f);
+        }
+        else
+        {
+            // Fallback: try to find AudioSource on this object
+            AudioSource audioSource = GetComponent<AudioSource>();
+            if (audioSource != null)
+            {
+                audioSource.PlayOneShot(soundToPlay, 0.7f);
+            }
+        }
     }
 
     private void DisableInteractableColliders()

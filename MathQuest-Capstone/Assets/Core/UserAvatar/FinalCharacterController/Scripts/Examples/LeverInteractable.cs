@@ -21,6 +21,7 @@ public class LeverInteractable : MonoBehaviour, IInteractable
     [Header("Audio (Optional)")]
     [SerializeField] private AudioClip pullSound;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private bool useAudioManager = true;
 
     private Quaternion targetRotation;
     private bool isAnimating = false;
@@ -48,8 +49,18 @@ public class LeverInteractable : MonoBehaviour, IInteractable
         UpdateTargetRotation();
         isAnimating = true;
 
-        if (audioSource && pullSound)
-            audioSource.PlayOneShot(pullSound);
+        // Play sound
+        if (pullSound != null)
+        {
+            if (useAudioManager && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFXOneShot(pullSound, transform.position, 0.8f);
+            }
+            else if (audioSource != null)
+            {
+                audioSource.PlayOneShot(pullSound);
+            }
+        }
 
         // Invoke events
         if (isActivated)

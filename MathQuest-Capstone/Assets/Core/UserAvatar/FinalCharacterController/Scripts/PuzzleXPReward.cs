@@ -12,6 +12,12 @@ public class PuzzleXPReward : MonoBehaviour
     [SerializeField] private string reason = "Puzzle solved";
     [SerializeField] private bool awardOnlyOnce = true;
 
+    [Header("Audio (Optional)")]
+    [SerializeField] private AudioClip xpGainSound;
+    [SerializeField] private AudioClip puzzleSolvedSound;
+    [SerializeField] private bool useAudioManager = true;
+    [SerializeField] private bool playSounds = true;
+
     private bool hasAwarded;
 
     private void Awake()
@@ -35,6 +41,35 @@ public class PuzzleXPReward : MonoBehaviour
 
         xpTracker.GrantXP(xpAmount, reason);
         hasAwarded = true;
+        
+        // Play sound effect
+        PlayXPSound();
+    }
+    
+    private void PlayXPSound()
+    {
+        if (!playSounds) return;
+        
+        // Prefer puzzle solved sound if available, otherwise use generic XP sound
+        AudioClip soundToPlay = puzzleSolvedSound != null ? puzzleSolvedSound : xpGainSound;
+        
+        if (soundToPlay == null) return;
+        
+        Vector3 position = transform.position;
+        
+        if (useAudioManager && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFXOneShot(soundToPlay, position, 0.7f);
+        }
+        else
+        {
+            // Fallback: try to find AudioSource on this object
+            AudioSource audioSource = GetComponent<AudioSource>();
+            if (audioSource != null)
+            {
+                audioSource.PlayOneShot(soundToPlay, 0.7f);
+            }
+        }
     }
 
     public void ResetReward()

@@ -25,6 +25,14 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
     [Tooltip("Show this message when chest is locked")]
     [SerializeField] private string lockedMessage = "This chest is locked! Solve the puzzle to open it.";
 
+    [Header("Audio (Optional)")]
+    [SerializeField] private AudioClip openSound;
+    [SerializeField] private AudioClip closeSound;
+    [SerializeField] private AudioClip unlockSound;
+    [SerializeField] private AudioClip lockedSound;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private bool useAudioManager = true;
+
     private IPuzzle puzzle;
     private bool isUnlocked = false;
     private bool opened = false;
@@ -42,6 +50,9 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
 
         SetWrap(openClip);
         SetWrap(closeClip);
+        
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
 
         // Setup puzzle reference
         if (puzzleComponent != null)
@@ -84,6 +95,7 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
         if (requiresPuzzle && !isUnlocked)
         {
             Debug.Log("Chest is locked! Showing puzzle...");
+            PlayChestSound(lockedSound);
             ShowLockedMessage();
             ShowPuzzle();
             return;
@@ -97,11 +109,13 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
         {
             Play(closeClip.name);
             opened = false;
+            PlayChestSound(closeSound);
         }
         else
         {
             Play(openClip.name);
             opened = true;
+            PlayChestSound(openSound);
         }
     }
 
@@ -131,15 +145,28 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
         Debug.Log("Puzzle completed! Chest is now unlocked.");
         isUnlocked = true;
         
+        // Play unlock sound
+        PlayChestSound(unlockSound);
+        
         // Automatically open the chest after puzzle completion
         if (openClip)
         {
             Play(openClip.name);
             opened = true;
+            // Play open sound after a short delay to let unlock sound play first
+            if (openSound != null)
+            {
+                Invoke(nameof(PlayOpenSoundDelayed), 0.3f);
+            }
         }
 
         // Optional: Show unlock feedback
         ShowUnlockedMessage();
+    }
+    
+    private void PlayOpenSoundDelayed()
+    {
+        PlayChestSound(openSound);
     }
 
     private void OnPuzzleCancelled()
@@ -186,6 +213,20 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
 
     public bool IsLocked => requiresPuzzle && !isUnlocked;
     public bool IsOpened => opened;
+
+    private void PlayChestSound(AudioClip clip)
+    {
+        if (clip == null) return;
+        
+        if (useAudioManager && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFXOneShot(clip, transform.position, 0.8f);
+        }
+        else if (audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+    }
 
     // Editor helper
     void OnValidate()

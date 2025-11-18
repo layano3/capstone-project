@@ -26,6 +26,7 @@ public class NPCInteractable : MonoBehaviour, IInteractable
     [Header("Audio (Optional)")]
     [SerializeField] private AudioClip talkSound;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private bool useAudioManager = true;
 
     void Start()
     {
@@ -55,8 +56,17 @@ public class NPCInteractable : MonoBehaviour, IInteractable
         ShowDialogue(currentLine);
 
         // Play sound
-        if (audioSource && talkSound)
-            audioSource.PlayOneShot(talkSound);
+        if (talkSound != null)
+        {
+            if (useAudioManager && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFXOneShot(talkSound, transform.position, 0.8f);
+            }
+            else if (audioSource != null)
+            {
+                audioSource.PlayOneShot(talkSound);
+            }
+        }
 
         // Advance to next line
         currentLineIndex++;

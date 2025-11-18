@@ -20,6 +20,18 @@ public class XPRewardSystem : MonoBehaviour
     public int streakBonusXP = 10; // Per day of streak
     public int helpfulActionXP = 15;
     
+    [Header("Audio & VFX (Optional)")]
+    [SerializeField] private AudioClip xpGainSound;
+    [SerializeField] private AudioClip questCompleteSound;
+    [SerializeField] private AudioClip puzzleSolvedSound;
+    [SerializeField] private AudioClip levelUpSound;
+    [SerializeField] private GameObject xpGainVFX;
+    [SerializeField] private GameObject questCompleteVFX;
+    [SerializeField] private GameObject puzzleSolvedVFX;
+    [SerializeField] private GameObject levelUpVFX;
+    [SerializeField] private bool playSounds = true;
+    [SerializeField] private bool spawnVFX = true;
+    
     private static XPRewardSystem _instance;
     public static XPRewardSystem Instance
     {
@@ -142,6 +154,9 @@ public class XPRewardSystem : MonoBehaviour
             {
                 Debug.Log($"✅ Awarded {amount} XP: {reason}");
                 
+                // Play sound effects and spawn VFX
+                PlayRewardEffects(amount, reason, updatedBy);
+                
                 // Trigger behaviour analysis after significant XP gains
                 if (amount >= 50)
                 {
@@ -153,6 +168,62 @@ public class XPRewardSystem : MonoBehaviour
                 }
             }
         }));
+    }
+    
+    private void PlayRewardEffects(int amount, string reason, string source)
+    {
+        // Find player position for VFX spawning
+        Vector3 playerPosition = GetPlayerPosition();
+        
+        // Determine which sound and VFX to use based on source
+        AudioClip soundToPlay = null;
+        GameObject vfxToSpawn = null;
+        
+        switch (source)
+        {
+            case "QuestSystem":
+                soundToPlay = questCompleteSound;
+                vfxToSpawn = questCompleteVFX;
+                break;
+            case "PuzzleSystem":
+                soundToPlay = puzzleSolvedSound;
+                vfxToSpawn = puzzleSolvedVFX;
+                break;
+            default:
+                soundToPlay = xpGainSound;
+                vfxToSpawn = xpGainVFX;
+                break;
+        }
+        
+        // Play sound effect
+        if (playSounds && soundToPlay != null && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFXOneShot(soundToPlay, playerPosition, 0.7f);
+        }
+        
+        // Spawn VFX
+        if (spawnVFX && vfxToSpawn != null && VFXManager.Instance != null)
+        {
+            VFXManager.Instance.SpawnVFX(vfxToSpawn, playerPosition, Quaternion.identity, null, 3f);
+        }
+    }
+    
+    private Vector3 GetPlayerPosition()
+    {
+        // Try to find player/camera position
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            return player.transform.position + Vector3.up * 1.5f; // Slightly above player
+        }
+        
+        var camera = Camera.main;
+        if (camera != null)
+        {
+            return camera.transform.position;
+        }
+        
+        return Vector3.zero;
     }
 }
 
