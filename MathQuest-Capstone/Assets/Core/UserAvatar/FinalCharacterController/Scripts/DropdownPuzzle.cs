@@ -5,42 +5,52 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Generic multiple-choice puzzle that can optionally display a supporting image.
-/// Keeps the same queueing behavior as SimpleMathPuzzle by serving questions sequentially or at random.
+/// Puzzle that uses dropdown menus for answers (e.g., Name + Function questions).
+/// Separate from MultipleChoicePuzzle which uses buttons.
 /// </summary>
-public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
+public class DropdownPuzzle : MonoBehaviour, IPuzzle
 {
     [Serializable]
     public struct ChoiceOption
     {
         [TextArea]
         public string label;
-        [Tooltip("Mark true for the correct option (supports multiple correct answers if needed).")]
-        public bool isCorrect;
     }
 
     [Serializable]
-    public struct MultipleChoiceQuestion
+    public struct DropdownGroup
+    {
+        [Tooltip("Label/header for this dropdown (e.g., 'Nom:', 'Fonction:')")]
+        public string label;
+        [Tooltip("Options available in this dropdown")]
+        public ChoiceOption[] options;
+        [Tooltip("Index of the correct option (0-based)")]
+        public int correctOptionIndex;
+    }
+
+    [Serializable]
+    public struct DropdownQuestion
     {
         [TextArea]
         public string prompt;
         [Tooltip("Optional helper image (leave empty for text-only questions).")]
         public Sprite promptImage;
-        [Tooltip("Options for button-based questions")]
-        public ChoiceOption[] options;
+        [Tooltip("Dropdown groups (e.g., Name + Function). At least one required.")]
+        public DropdownGroup[] dropdownGroups;
     }
 
     [Header("UI References")]
     [SerializeField] private GameObject puzzlePanel;
     [SerializeField] private TextMeshProUGUI promptText;
     [SerializeField] private Image promptImage;
-    [SerializeField] private Button[] optionButtons;
-    [SerializeField] private TextMeshProUGUI[] optionLabels;
+    [SerializeField] private TMP_Dropdown[] dropdownMenus;
+    [SerializeField] private TextMeshProUGUI[] dropdownLabels;
+    [SerializeField] private Button submitButton;
     [SerializeField] private Button cancelButton;
     [SerializeField] private TextMeshProUGUI feedbackText;
 
     [Header("Puzzle Settings")]
-    [SerializeField] private MultipleChoiceQuestion[] questions = Array.Empty<MultipleChoiceQuestion>();
+    [SerializeField] private DropdownQuestion[] questions = Array.Empty<DropdownQuestion>();
     [Tooltip("Randomly pick a question each time instead of using them in order.")]
     [SerializeField] private bool randomizeQuestionOrder = false;
     [Tooltip("Shuffle option order each time a question is shown.")]
@@ -52,7 +62,7 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
     private Action onCancelCallback;
     private bool isCompleted;
     private int sequentialQuestionIndex;
-    private readonly List<ChoiceOption> activeOptions = new List<ChoiceOption>();
+    private DropdownQuestion currentQuestion;
 
     public bool IsActive => puzzlePanel != null && puzzlePanel.activeSelf;
     public bool IsCompleted => isCompleted;
@@ -61,11 +71,8 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
     {
         if (puzzlePanel) puzzlePanel.SetActive(false);
 
-        for (int i = 0; i < optionButtons.Length; i++)
-        {
-            int capturedIndex = i;
-            optionButtons[i]?.onClick.AddListener(() => OnOptionSelected(capturedIndex));
-        }
+        if (submitButton != null)
+            submitButton.onClick.AddListener(OnSubmitClicked);
 
         if (cancelButton != null)
             cancelButton.onClick.AddListener(OnCancelClicked);
@@ -79,13 +86,13 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
 
         if (questions == null || questions.Length == 0)
         {
-            Debug.LogWarning("MultipleChoicePuzzle: No questions configured.");
+            Debug.LogWarning("DropdownPuzzle: No questions configured.");
             onCancelCallback?.Invoke();
             return;
         }
 
         // Get question at current index without advancing (advance happens on completion)
-        MultipleChoiceQuestion question = GetQuestionAtCurrentIndex();
+        DropdownQuestion question = GetQuestionAtCurrentIndex();
         LoadQuestion(question);
 
         if (puzzlePanel) puzzlePanel.SetActive(true);
@@ -110,7 +117,7 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
         HidePuzzle();
     }
 
-    private MultipleChoiceQuestion GetQuestionAtCurrentIndex()
+    private DropdownQuestion GetQuestionAtCurrentIndex()
     {
         if (questions == null || questions.Length == 0)
             return default;
@@ -149,8 +156,10 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
         }
     }
 
-    private void LoadQuestion(MultipleChoiceQuestion question)
+    private void LoadQuestion(DropdownQuestion question)
     {
+        currentQuestion = question;
+        
         if (promptText)
             promptText.text = question.prompt ?? string.Empty;
 
@@ -168,31 +177,70 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
             }
         }
 
-        activeOptions.Clear();
-        var optionData = PrepareOptionData(question.options);
-
-        for (int i = 0; i < optionButtons.Length; i++)
+        var dropdownGroups = question.dropdownGroups;
+        if (dropdownGroups == null || dropdownGroups.Length == 0)
         {
-            bool hasOption = i < optionData.Count;
+            Debug.LogWarning("DropdownPuzzle: Question has no dropdownGroups!");
+            return;
+        }
 
-            if (optionButtons[i] != null)
-                optionButtons[i].gameObject.SetActive(hasOption);
+        for (int i = 0; i < dropdownMenus.Length; i++)
+        {
+            bool hasDropdown = i < dropdownGroups.Length;
 
-            if (optionLabels.Length > i && optionLabels[i] != null)
-                optionLabels[i].gameObject.SetActive(hasOption);
+            if (dropdownMenus[i] != null)
+                dropdownMenus[i].gameObject.SetActive(hasDropdown);
 
-            if (!hasOption)
+            if (dropdownLabels.Length > i && dropdownLabels[i] != null)
+                dropdownLabels[i].gameObject.SetActive(hasDropdown);
+
+            if (!hasDropdown)
                 continue;
 
-            var data = optionData[i];
-            activeOptions.Add(data);
+            var group = dropdownGroups[i];
+            var dropdown = dropdownMenus[i];
+            
+            if (dropdown == null)
+                continue;
 
-            if (optionButtons[i] != null)
-                optionButtons[i].interactable = true;
+            // Set label
+            if (dropdownLabels.Length > i && dropdownLabels[i] != null)
+                dropdownLabels[i].text = group.label ?? string.Empty;
 
-            if (optionLabels.Length > i && optionLabels[i] != null)
-                optionLabels[i].text = data.label ?? string.Empty;
+            // Prepare options
+            var optionData = PrepareOptionData(group.options);
+            dropdown.ClearOptions();
+
+            List<string> optionTexts = new List<string>();
+            foreach (var option in optionData)
+            {
+                optionTexts.Add(option.label ?? string.Empty);
+            }
+
+            dropdown.AddOptions(optionTexts);
+            
+            // Reset dropdown to first option and refresh
+            // Use -1 first to clear, then set to 0 to show first option
+            dropdown.value = -1;
+            dropdown.value = 0;
+            dropdown.RefreshShownValue();
+            
+            // Ensure dropdown is properly configured
+            if (dropdown.template == null)
+            {
+                Debug.LogWarning($"DropdownPuzzle: Dropdown {i} has no template assigned! Dropdown will not work properly.");
+            }
+            
+            // Ensure template is hidden (should be by default, but double-check)
+            if (dropdown.template != null && dropdown.template.gameObject.activeSelf)
+            {
+                dropdown.template.gameObject.SetActive(false);
+            }
         }
+
+        // Show submit button
+        if (submitButton != null)
+            submitButton.gameObject.SetActive(true);
     }
 
     private List<ChoiceOption> PrepareOptionData(ChoiceOption[] source)
@@ -214,19 +262,35 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
         return result;
     }
 
-    private void OnOptionSelected(int optionIndex)
+    private void OnSubmitClicked()
     {
-        if (optionIndex < 0 || optionIndex >= activeOptions.Count)
+        if (currentQuestion.dropdownGroups == null)
             return;
 
-        var selectedOption = activeOptions[optionIndex];
-        if (selectedOption.isCorrect)
+        // Check if all dropdowns have the correct selection
+        bool allCorrect = true;
+        for (int i = 0; i < dropdownMenus.Length && i < currentQuestion.dropdownGroups.Length; i++)
+        {
+            if (dropdownMenus[i] == null || !dropdownMenus[i].gameObject.activeSelf)
+                continue;
+
+            var group = currentQuestion.dropdownGroups[i];
+            int selectedIndex = dropdownMenus[i].value;
+
+            if (selectedIndex != group.correctOptionIndex)
+            {
+                allCorrect = false;
+                break;
+            }
+        }
+
+        if (allCorrect)
         {
             HandleCorrectAnswer();
         }
         else
         {
-            HandleIncorrectAnswer(optionIndex);
+            ShowFeedback("Incorrect! Please check your selections and try again.", Color.red);
         }
     }
 
@@ -234,21 +298,12 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
     {
         isCompleted = true;
         ShowFeedback("Correct! Unlocking...", Color.green);
-        SetOptionInteractivity(false);
+        SetDropdownInteractivity(false);
         
         // Advance to next question for next time
         AdvanceQuestionIndex();
         
         Invoke(nameof(CompleteWithDelay), completionDelay);
-    }
-
-    private void HandleIncorrectAnswer(int selectedIndex)
-    {
-        ShowFeedback("Incorrect! Try again.", Color.red);
-        if (selectedIndex >= 0 && selectedIndex < optionButtons.Length && optionButtons[selectedIndex] != null)
-        {
-            optionButtons[selectedIndex].interactable = false;
-        }
     }
 
     private void CompleteWithDelay()
@@ -263,13 +318,16 @@ public class MultipleChoicePuzzle : MonoBehaviour, IPuzzle
         onCancelCallback?.Invoke();
     }
 
-    private void SetOptionInteractivity(bool enabled)
+    private void SetDropdownInteractivity(bool enabled)
     {
-        foreach (var button in optionButtons)
+        foreach (var dropdown in dropdownMenus)
         {
-            if (button != null)
-                button.interactable = enabled;
+            if (dropdown != null)
+                dropdown.interactable = enabled;
         }
+
+        if (submitButton != null)
+            submitButton.interactable = enabled;
     }
 
     private void ShowFeedback(string message, Color color)

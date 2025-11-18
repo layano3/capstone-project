@@ -4445,7 +4445,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isLocked: 1
-  puzzleGameObject: {fileID: 1581078602}
+  puzzleGameObject: {fileID: 1130734159}
   solveOnce: 1
   disableInteractionAfterSolve: 1
   canBeManuallyUnlocked: 1
@@ -4705,6 +4705,9 @@ MonoBehaviour:
   - {fileID: 360674018}
   - {fileID: 871288655}
   - {fileID: 5066891}
+  dropdownMenus: []
+  dropdownLabels: []
+  submitButton: {fileID: 0}
   cancelButton: {fileID: 199631444}
   feedbackText: {fileID: 1424167843}
   questions:
@@ -4721,9 +4724,34 @@ MonoBehaviour:
 
 '
       isCorrect: 0
+    - label: 'A=4, B=8, C=3, D=6, E=1, F=9, G=5, H=7 and I=2
+
+'
+      isCorrect: 0
+    dropdownGroups: []
+  - prompt: Trouve la valeur de A, B, C, D, E, F, G, H et I.
+    promptImage: {fileID: 21300000, guid: beaa68da4f0b65846bca14349ff75204, type: 3}
+    options: []
+    dropdownGroups:
+    - label: Nom
+      options:
+      - label: 
+        isCorrect: 0
+      - label: 
+        isCorrect: 0
+      - label: 
+        isCorrect: 0
+      - label: 
+        isCorrect: 0
+      - label: 
+        isCorrect: 0
+      - label: 
+        isCorrect: 0
+      correctOptionIndex: 0
   randomizeQuestionOrder: 0
   randomizeOptions: 1
   completionDelay: 0.4
+  requireSubmitForDropdowns: 1
 --- !u!114 &1130734162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6282,12 +6310,6 @@ MonoBehaviour:
   - prompt: 'Quel est le nombre qui continue cette suite : 2, 5, 10, 17, 26, ...
       ?'
     correctAnswer: 37
-  - prompt: 'Sur le chemin vers la plage, vous croisez dix maisons sur votre droite
-      et au retour, dix maisons sur votre gauche.  Combien y a-t-il de maisons en
-      tout?
-
-'
-    correctAnswer: 10
   - prompt: 'Sur le chemin vers la plage, vous croisez dix maisons sur votre droite
       et au retour, dix maisons sur votre gauche.  Combien y a-t-il de maisons en
       tout?

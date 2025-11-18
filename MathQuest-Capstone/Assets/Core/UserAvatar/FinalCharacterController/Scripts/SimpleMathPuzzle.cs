@@ -97,7 +97,7 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
     {
         isCompleted = false;
         correctAnswer = 0;
-        sequentialQuestionIndex = 0;
+        // Don't reset sequentialQuestionIndex - keep it global so questions advance across all interactables
         if (answerInput) answerInput.text = "";
         if (feedbackText) feedbackText.text = "";
         HidePuzzle();
@@ -107,7 +107,7 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
     {
         if (useCustomQuestions && customQuestions != null && customQuestions.Length > 0)
         {
-            var questionData = GetNextCustomQuestion();
+            var questionData = GetCustomQuestionAtCurrentIndex();
             if (!string.IsNullOrWhiteSpace(questionData.prompt))
             {
                 correctAnswer = questionData.correctAnswer;
@@ -168,7 +168,7 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
         Debug.Log($"Generated puzzle: {question} (Answer: {correctAnswer})");
     }
 
-    private CustomQuestion GetNextCustomQuestion()
+    private CustomQuestion GetCustomQuestionAtCurrentIndex()
     {
         if (customQuestions == null || customQuestions.Length == 0)
         {
@@ -181,11 +181,20 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
             return customQuestions[index];
         }
 
-        // Clamp index to valid range
+        // Clamp index to valid range and return question at that index
         int clampedIndex = Mathf.Clamp(sequentialQuestionIndex, 0, customQuestions.Length - 1);
-        var question = customQuestions[clampedIndex];
-        
-        // Only advance index if we're not at the end (to allow cycling)
+        return customQuestions[clampedIndex];
+    }
+
+    private void AdvanceCustomQuestionIndex()
+    {
+        if (customQuestions == null || customQuestions.Length == 0)
+            return;
+
+        if (randomizeCustomQuestions)
+            return; // Don't advance for random questions
+
+        // Advance index, wrapping around if needed
         if (sequentialQuestionIndex < customQuestions.Length - 1)
         {
             sequentialQuestionIndex++;
@@ -195,8 +204,6 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
             // Wrap around to beginning
             sequentialQuestionIndex = 0;
         }
-        
-        return question;
     }
 
     private void OnSubmitClicked()
@@ -213,6 +220,13 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
             {
                 ShowFeedback("Correct! Unlocking...", Color.green);
                 isCompleted = true;
+                
+                // Advance to next question for next time
+                if (useCustomQuestions && customQuestions != null && customQuestions.Length > 0)
+                {
+                    AdvanceCustomQuestionIndex();
+                }
+                
                 Invoke(nameof(CompleteWithDelay), 0.5f);
             }
             else
