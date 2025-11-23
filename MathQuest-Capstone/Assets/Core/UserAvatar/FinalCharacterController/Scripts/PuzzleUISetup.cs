@@ -411,13 +411,35 @@ public class PuzzleUISetup : MonoBehaviour
                 promptTMP.enableWordWrapping = true;
                 promptTMP.overflowMode = TextOverflowModes.Overflow;
                 promptTMP.fontSize = 24;
+                promptTMP.autoSizeTextContainer = false;
+                promptTMP.alignment = TextAlignmentOptions.TopLeft; // Left-align for proper wrapping
+            }
+
+            RectTransform promptRect = promptTextTransform.GetComponent<RectTransform>();
+            if (promptRect != null)
+            {
+                promptRect.anchorMin = new Vector2(0, 1);
+                promptRect.anchorMax = new Vector2(1, 1);
+                promptRect.pivot = new Vector2(0.5f, 1);
+                promptRect.offsetMin = Vector2.zero;
+                promptRect.offsetMax = Vector2.zero;
             }
 
             LayoutElement promptLayout = promptTextTransform.GetComponent<LayoutElement>();
-            if (promptLayout != null)
-            {
-                promptLayout.minHeight = 50;
-            }
+            if (promptLayout == null)
+                promptLayout = promptTextTransform.gameObject.AddComponent<LayoutElement>();
+            
+            promptLayout.minHeight = 50;
+            promptLayout.flexibleHeight = 0;
+            promptLayout.preferredWidth = -1; // Use full available width (parent will constrain)
+            promptLayout.flexibleWidth = 0; // Don't expand beyond preferred
+
+            ContentSizeFitter promptFitter = promptTextTransform.GetComponent<ContentSizeFitter>();
+            if (promptFitter == null)
+                promptFitter = promptTextTransform.gameObject.AddComponent<ContentSizeFitter>();
+            
+            promptFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize; // Height grows based on content
+            promptFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained; // Width is fixed via LayoutElement
         }
 
         // Fix dropdowns container
@@ -458,8 +480,9 @@ public class PuzzleUISetup : MonoBehaviour
                             VerticalLayoutGroup contentLayout = contentTransform.GetComponent<VerticalLayoutGroup>();
                             if (contentLayout != null)
                             {
-                                contentLayout.spacing = 2;
+                                contentLayout.spacing = 4; // Increased spacing
                                 contentLayout.padding = new RectOffset(2, 2, 2, 2);
+                                contentLayout.childControlHeight = false; // Let items control their own height
                             }
 
                             // Fix each item in the content
@@ -468,20 +491,27 @@ public class PuzzleUISetup : MonoBehaviour
                                 Transform itemTransform = contentTransform.GetChild(i);
                                 if (itemTransform.name == "Item")
                                 {
-                                    // Update item height
+                                    // Update item height to allow growth
                                     RectTransform itemRect = itemTransform.GetComponent<RectTransform>();
                                     if (itemRect != null)
                                     {
-                                        itemRect.sizeDelta = new Vector2(0, 45);
+                                        itemRect.sizeDelta = new Vector2(0, 45); // Initial height, will grow with ContentSizeFitter
                                     }
 
                                     LayoutElement itemLayout = itemTransform.GetComponent<LayoutElement>();
                                     if (itemLayout == null)
                                         itemLayout = itemTransform.gameObject.AddComponent<LayoutElement>();
                                     
-                                    itemLayout.minHeight = 45;
-                                    itemLayout.preferredHeight = 45;
+                                    itemLayout.minHeight = 45; // Minimum height for single-line text
+                                    itemLayout.preferredHeight = -1; // Let ContentSizeFitter determine preferred height
                                     itemLayout.flexibleHeight = 0;
+
+                                    // Add ContentSizeFitter to item if it doesn't exist
+                                    ContentSizeFitter itemFitter = itemTransform.GetComponent<ContentSizeFitter>();
+                                    if (itemFitter == null)
+                                        itemFitter = itemTransform.gameObject.AddComponent<ContentSizeFitter>();
+                                    itemFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                                    itemFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
 
                                     // Fix item label
                                     Transform labelTransform = itemTransform.Find("Item Label");
@@ -492,14 +522,36 @@ public class PuzzleUISetup : MonoBehaviour
                                         {
                                             labelTMP.enableWordWrapping = true;
                                             labelTMP.overflowMode = TextOverflowModes.Overflow;
+                                            labelTMP.alignment = TextAlignmentOptions.TopLeft; // Top-left for multi-line
+                                            labelTMP.autoSizeTextContainer = false;
                                         }
 
                                         RectTransform labelRect = labelTransform.GetComponent<RectTransform>();
                                         if (labelRect != null)
                                         {
-                                            labelRect.offsetMin = new Vector2(35, 5);
-                                            labelRect.offsetMax = new Vector2(-10, -5);
+                                            // Anchor to top so it can grow downward, ContentSizeFitter will control height
+                                            labelRect.anchorMin = new Vector2(0, 1);
+                                            labelRect.anchorMax = new Vector2(1, 1);
+                                            labelRect.pivot = new Vector2(0.5f, 1);
+                                            labelRect.offsetMin = new Vector2(35, 0);
+                                            labelRect.offsetMax = new Vector2(-10, 0);
+                                            labelRect.sizeDelta = new Vector2(0, 35); // Initial height
                                         }
+
+                                        // Add LayoutElement to label if it doesn't exist
+                                        LayoutElement labelLayout = labelTransform.GetComponent<LayoutElement>();
+                                        if (labelLayout == null)
+                                            labelLayout = labelTransform.gameObject.AddComponent<LayoutElement>();
+                                        labelLayout.minHeight = 35;
+                                        labelLayout.preferredHeight = -1;
+                                        labelLayout.flexibleHeight = 0;
+
+                                        // Add ContentSizeFitter to label if it doesn't exist
+                                        ContentSizeFitter labelFitter = labelTransform.GetComponent<ContentSizeFitter>();
+                                        if (labelFitter == null)
+                                            labelFitter = labelTransform.gameObject.AddComponent<ContentSizeFitter>();
+                                        labelFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+                                        labelFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
                                     }
                                 }
                             }
@@ -582,20 +634,24 @@ public class PuzzleUISetup : MonoBehaviour
         promptTMP.enableWordWrapping = true;
         promptTMP.overflowMode = TextOverflowModes.Overflow; // Allow text to expand
         promptTMP.autoSizeTextContainer = false; // We'll use ContentSizeFitter instead
+        promptTMP.alignment = TextAlignmentOptions.TopLeft; // Left-align for proper wrapping
         
         RectTransform promptRect = promptTextObj.GetComponent<RectTransform>();
         promptRect.anchorMin = new Vector2(0, 1);
         promptRect.anchorMax = new Vector2(1, 1);
         promptRect.pivot = new Vector2(0.5f, 1);
+        promptRect.offsetMin = Vector2.zero;
+        promptRect.offsetMax = Vector2.zero;
         
         LayoutElement promptLayout = promptTextObj.AddComponent<LayoutElement>();
         promptLayout.minHeight = 50;
         promptLayout.flexibleHeight = 0;
-        promptLayout.preferredWidth = -1; // Use full width
+        promptLayout.preferredWidth = -1; // Use full available width (parent will constrain)
+        promptLayout.flexibleWidth = 0; // Don't expand beyond preferred
         
         ContentSizeFitter promptFitter = promptTextObj.AddComponent<ContentSizeFitter>();
-        promptFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        promptFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        promptFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize; // Height grows based on content
+        promptFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained; // Width is fixed via LayoutElement
 
         // Create prompt image container (auto-hides when no image)
         GameObject promptImageObj = new GameObject("PromptImage");
@@ -1002,8 +1058,8 @@ public class PuzzleUISetup : MonoBehaviour
         // We'll add it to the item template instead if needed
 
         VerticalLayoutGroup contentLayout = contentObj.AddComponent<VerticalLayoutGroup>();
-        contentLayout.spacing = 2; // Add spacing between dropdown items to prevent overlap
-        contentLayout.childControlHeight = false;
+        contentLayout.spacing = 4; // Increased spacing between dropdown items to prevent overlap
+        contentLayout.childControlHeight = false; // Let items control their own height
         contentLayout.childControlWidth = true;
         contentLayout.childForceExpandHeight = false;
         contentLayout.childForceExpandWidth = true;
@@ -1027,14 +1083,14 @@ public class PuzzleUISetup : MonoBehaviour
         itemRect.anchorMin = new Vector2(0, 1);
         itemRect.anchorMax = new Vector2(1, 1);
         itemRect.pivot = new Vector2(0.5f, 1);
-        itemRect.sizeDelta = new Vector2(0, 45); // Increased height to prevent text overlap
+        itemRect.sizeDelta = new Vector2(0, 45); // Initial height, will grow with ContentSizeFitter
         itemRect.anchoredPosition = Vector2.zero;
         
-        // Add LayoutElement to ensure proper sizing
+        // Add LayoutElement to ensure proper sizing - set minHeight but let ContentSizeFitter control preferred
         LayoutElement itemLayoutElement = itemTemplate.AddComponent<LayoutElement>();
-        itemLayoutElement.minHeight = 45;
-        itemLayoutElement.preferredHeight = 45;
-        itemLayoutElement.flexibleHeight = 0;
+        itemLayoutElement.minHeight = 45; // Minimum height for single-line text
+        itemLayoutElement.preferredHeight = -1; // Let ContentSizeFitter determine preferred height
+        itemLayoutElement.flexibleHeight = 0; // Don't expand beyond content
 
         // Add Toggle component to Item - THIS IS CRITICAL
         Toggle itemToggle = itemTemplate.AddComponent<Toggle>();
@@ -1081,19 +1137,42 @@ public class PuzzleUISetup : MonoBehaviour
         // Create Item Label as a CHILD of Item (like Unity's manual setup)
         GameObject itemLabelObj = CreateText("Item Label", itemTemplate.transform, "Option", 18, FontStyles.Normal);
         TextMeshProUGUI itemLabelTMP = itemLabelObj.GetComponent<TextMeshProUGUI>();
-        itemLabelTMP.alignment = TextAlignmentOptions.Left;
+        itemLabelTMP.alignment = TextAlignmentOptions.TopLeft; // Top-left alignment for multi-line text
         itemLabelTMP.enableWordWrapping = true;
         itemLabelTMP.overflowMode = TextOverflowModes.Overflow; // Allow text to expand vertically
         itemLabelTMP.autoSizeTextContainer = false;
         
         RectTransform itemLabelRect = itemLabelObj.GetComponent<RectTransform>();
-        itemLabelRect.anchorMin = new Vector2(0, 0);
+        // Anchor to top so it can grow downward, ContentSizeFitter will control height
+        itemLabelRect.anchorMin = new Vector2(0, 1);
         itemLabelRect.anchorMax = new Vector2(1, 1);
-        itemLabelRect.offsetMin = new Vector2(35, 5); // Leave space for checkmark, add padding
-        itemLabelRect.offsetMax = new Vector2(-10, -5); // Add padding
+        itemLabelRect.pivot = new Vector2(0.5f, 1);
+        // Set horizontal padding, vertical will be controlled by ContentSizeFitter
+        itemLabelRect.offsetMin = new Vector2(35, 0); // Left padding for checkmark
+        itemLabelRect.offsetMax = new Vector2(-10, 0); // Right padding
+        // Set initial height - ContentSizeFitter will grow it as needed
+        itemLabelRect.sizeDelta = new Vector2(0, 35); // Initial height for text
         
-        // Don't add ContentSizeFitter to label - it's constrained by the item's fixed height
-        // The label will wrap text within the item's bounds
+        // Add LayoutElement to label to set minimum height
+        LayoutElement itemLabelLayout = itemLabelObj.AddComponent<LayoutElement>();
+        itemLabelLayout.minHeight = 35; // Minimum height for text
+        itemLabelLayout.preferredHeight = -1; // Let ContentSizeFitter determine
+        itemLabelLayout.flexibleHeight = 0;
+        
+        // Add ContentSizeFitter to label so it grows with text content
+        ContentSizeFitter labelFitter = itemLabelObj.AddComponent<ContentSizeFitter>();
+        labelFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize; // Grow height based on text
+        labelFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained; // Width is constrained by item
+        
+        // Add ContentSizeFitter to item so it grows with label's preferred size
+        // This must be added AFTER the label so it can read the label's preferred size
+        ContentSizeFitter itemFitter = itemTemplate.AddComponent<ContentSizeFitter>();
+        itemFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize; // Grow height based on label
+        itemFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained; // Width is controlled by layout
+        
+        // Update LayoutElement to use the preferred size from ContentSizeFitter
+        // We need to set preferredHeight to match what ContentSizeFitter will calculate
+        // But actually, LayoutElement will use the ContentSizeFitter's preferred size automatically
 
         // Ensure item template is the first child of Content (Unity may expect this)
         itemTemplate.transform.SetAsFirstSibling();
