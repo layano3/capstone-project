@@ -532,11 +532,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1500284129}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 421.2663, y: -421}
+  m_AnchoredPosition: {x: 250, y: -600}
   m_SizeDelta: {x: 284.1992, y: 801.7295}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &58945091
@@ -729,6 +729,154 @@ MonoBehaviour:
   m_EffectColor: {r: 0.009433985, g: 0.009433985, b: 0.0017354974, a: 0.5}
   m_EffectDistance: {x: 1.5, y: -1.5}
   m_UseGraphicAlpha: 1
+--- !u!1 &268920132
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 268920133}
+  - component: {fileID: 268920135}
+  - component: {fileID: 268920140}
+  - component: {fileID: 268920141}
+  m_Layer: 5
+  m_Name: CaptainsLogPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &268920133
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268920132}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 268920136}
+  m_Father: {fileID: 1747505414}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -142.5}
+  m_SizeDelta: {x: -30, y: -315}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &268920135
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268920132}
+  m_CullTransparentMesh: 1
+--- !u!224 &268920136
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268920137}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 268920133}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!1 &268920137
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 268920136}
+  - component: {fileID: 268920138}
+  - component: {fileID: 268920139}
+  m_Layer: 5
+  m_Name: CaptainLogContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &268920138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268920137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 15
+    m_Right: 15
+    m_Top: 15
+    m_Bottom: 15
+  m_ChildAlignment: 4
+  m_Spacing: 40
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!114 &268920139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268920137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
+--- !u!114 &268920140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268920132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414e41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &268920141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268920132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8eb0b2c418c9b804fa7e36fddb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &279819379
 GameObject:
   m_ObjectHideFlags: 0
@@ -1250,6 +1398,7 @@ GameObject:
   - component: {fileID: 467366284}
   - component: {fileID: 467366287}
   - component: {fileID: 467366286}
+  - component: {fileID: 467366288}
   - component: {fileID: 467366285}
   m_Layer: 5
   m_Name: StatsButton
@@ -1360,6 +1509,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 467366283}
   m_CullTransparentMesh: 1
+--- !u!114 &467366288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 467366283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &482681585
 GameObject:
   m_ObjectHideFlags: 0
@@ -1905,9 +2069,9 @@ MonoBehaviour:
   m_Padding:
     m_Left: 15
     m_Right: 15
-    m_Top: 150
-    m_Bottom: 15
-  m_ChildAlignment: 1
+    m_Top: 400
+    m_Bottom: 0
+  m_ChildAlignment: 4
   m_Spacing: 15
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
@@ -2093,6 +2257,7 @@ GameObject:
   - component: {fileID: 739152918}
   - component: {fileID: 739152921}
   - component: {fileID: 739152920}
+  - component: {fileID: 739152922}
   - component: {fileID: 739152919}
   m_Layer: 5
   m_Name: 'AchievementButton '
@@ -2203,6 +2368,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 739152917}
   m_CullTransparentMesh: 1
+--- !u!114 &739152922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 739152917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &791758624
 GameObject:
   m_ObjectHideFlags: 0
@@ -2524,8 +2704,8 @@ MonoBehaviour:
   m_Padding:
     m_Left: 15
     m_Right: 15
-    m_Top: 15
-    m_Bottom: 15
+    m_Top: 35
+    m_Bottom: -50
   m_ChildAlignment: 4
   m_Spacing: 10
   m_ChildForceExpandWidth: 0
@@ -2958,6 +3138,7 @@ RectTransform:
   - {fileID: 1963153119}
   - {fileID: 739152918}
   - {fileID: 467366284}
+  - {fileID: 58945090}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3025,7 +3206,7 @@ MonoBehaviour:
     m_Top: 300
     m_Bottom: 15
   m_ChildAlignment: 0
-  m_Spacing: 50
+  m_Spacing: 100
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -3181,6 +3362,7 @@ GameObject:
   - component: {fileID: 1747505414}
   - component: {fileID: 1747505416}
   - component: {fileID: 1747505415}
+  - component: {fileID: 1747505417}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -3203,6 +3385,7 @@ RectTransform:
   - {fileID: 1554177821}
   - {fileID: 2002647996}
   - {fileID: 640660047}
+  - {fileID: 268920133}
   m_Father: {fileID: 1500284129}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3248,6 +3431,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747505413}
   m_CullTransparentMesh: 1
+--- !u!114 &1747505417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747505413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1827610474
 GameObject:
   m_ObjectHideFlags: 0
@@ -3696,6 +3894,7 @@ GameObject:
   - component: {fileID: 1963153119}
   - component: {fileID: 1963153122}
   - component: {fileID: 1963153121}
+  - component: {fileID: 1963153123}
   - component: {fileID: 1963153120}
   m_Layer: 5
   m_Name: Captain's Log
@@ -3806,6 +4005,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1963153118}
   m_CullTransparentMesh: 1
+--- !u!114 &1963153123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1963153118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1984851635
 GameObject:
   m_ObjectHideFlags: 0
@@ -4197,15 +4411,15 @@ RectTransform:
   m_GameObject: {fileID: 2002647995}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.13265306, z: 1}
+  m_LocalScale: {x: 1, y: 0.1826531, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1747505414}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2, y: 419.8571}
-  m_SizeDelta: {x: 0, y: 2}
+  m_AnchoredPosition: {x: -2, y: 425.8571}
+  m_SizeDelta: {x: 0, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2002647997
 MonoBehaviour:
@@ -4278,10 +4492,13 @@ MonoBehaviour:
   xpText: {fileID: 27513757}
   levelText: {fileID: 1991204519}
   xpBar: {fileID: 0}
+  avatarSilhouette: {fileID: 58945091}
   statsButton: {fileID: 467366285}
   achievementButton: {fileID: 739152919}
+  captainLogButton: {fileID: 1963153120}
   statsPanel: {fileID: 1554177820}
   achievementPanel: {fileID: 640660046}
+  captainLogPanel: {fileID: 268920132}
   gradeText: {fileID: 196952615}
   timePlayedText: {fileID: 1984851637}
   streakText: {fileID: 733492400}
@@ -4290,6 +4507,8 @@ MonoBehaviour:
   lastActiveText: {fileID: 630129824}
   xpEventsContainer: {fileID: 983602617}
   xpEventRowPrefab: {fileID: 0}
+  captainLogContainer: {fileID: 268920136}
+  logEntryPrefab: {fileID: 0}
   config: {fileID: 11400000, guid: 6bfbc5afd2d18034db3d2f0decd831ad, type: 2}
 --- !u!4 &2091381061
 Transform:
@@ -4313,7 +4532,6 @@ SceneRoots:
   - {fileID: 1917574602}
   - {fileID: 1029768517}
   - {fileID: 1500284129}
-  - {fileID: 58945090}
   - {fileID: 407821235}
   - {fileID: 2091381061}
   - {fileID: 18853175}
