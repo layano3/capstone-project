@@ -37,6 +37,13 @@ public class MainMenu : MonoBehaviour
     public void LoadGame()
     {
         AudioManager.Instance.StopMusic();
+        
+        // Update activity tracker when entering game
+        if (ActivityTracker.Instance != null)
+        {
+            ActivityTracker.Instance.StartExploring("GamePlay");
+        }
+        
         SceneManager.LoadSceneAsync(5);
     }
 

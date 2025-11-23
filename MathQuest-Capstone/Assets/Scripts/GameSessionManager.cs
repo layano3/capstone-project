@@ -62,8 +62,18 @@ public class GameSessionManager : MonoBehaviour
             if (playtimeTracker == null)
             {
                 playtimeTracker = gameObject.AddComponent<PlaytimeTracker>();
-                playtimeTracker.config = config;
             }
+        }
+        
+        // Ensure config is set on playtimeTracker
+        if (playtimeTracker != null && playtimeTracker.config == null && config != null)
+        {
+            playtimeTracker.config = config;
+            Debug.Log("GameSessionManager: Set config on PlaytimeTracker");
+        }
+        else if (playtimeTracker != null && playtimeTracker.config == null)
+        {
+            Debug.LogError("GameSessionManager: Cannot set config on PlaytimeTracker - config is null!");
         }
         
         // Create StreakManager if missing
@@ -109,16 +119,35 @@ public class GameSessionManager : MonoBehaviour
             return;
         }
         
-        // Update last_active and set initial status
+        // Update last_active and set initial status based on current scene
         if (activityTracker != null)
         {
-            activityTracker.StartExploring("Main Menu");
+            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (sceneName.Contains("Game") || sceneName.Contains("BlackSmith") || sceneName.Contains("Env"))
+            {
+                activityTracker.StartExploring(sceneName);
+            }
+            else
+            {
+                activityTracker.StartExploring(sceneName);
+            }
         }
         
         // Check and update streak on login
         // (StreakManager does this automatically in Start)
         
+        // Schedule periodic behaviour analysis
+        InvokeRepeating(nameof(AnalyzeBehaviour), 300f, 300f); // Every 5 minutes
+        
         Debug.Log($"Game session initialized for user: {userId}");
+    }
+    
+    void AnalyzeBehaviour()
+    {
+        string userId = PlayerPrefs.GetString("CurrentUserId");
+        if (string.IsNullOrEmpty(userId) || behaviourAnalyzer == null) return;
+        
+        StartCoroutine(behaviourAnalyzer.AnalyzeAndUpdateBehaviour(userId));
     }
     
     void OnApplicationQuit()

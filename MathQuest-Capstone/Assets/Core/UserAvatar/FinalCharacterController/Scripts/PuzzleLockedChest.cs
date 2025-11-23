@@ -24,6 +24,16 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
     [SerializeField] private MonoBehaviour puzzleComponent;
     [Tooltip("Show this message when chest is locked")]
     [SerializeField] private string lockedMessage = "This chest is locked! Solve the puzzle to open it.";
+    
+    [Header("XP Reward")]
+    [Tooltip("Award XP when chest is unlocked")]
+    [SerializeField] private bool awardXPOnUnlock = true;
+    [Tooltip("Amount of XP to award when chest is unlocked")]
+    [SerializeField] private int xpRewardAmount = 50;
+    [Tooltip("Reason for XP reward")]
+    [SerializeField] private string xpRewardReason = "Chest unlocked";
+    [Tooltip("Reference to PlayerXPTracker (auto-found if not assigned)")]
+    [SerializeField] private PlayerXPTracker xpTracker;
 
     [Header("Audio (Optional)")]
     [SerializeField] private AudioClip openSound;
@@ -53,6 +63,16 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
         
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
+        
+        // Find XP tracker if not assigned
+        if (xpTracker == null && awardXPOnUnlock)
+        {
+            xpTracker = FindObjectOfType<PlayerXPTracker>();
+            if (xpTracker == null)
+            {
+                Debug.LogWarning($"PuzzleLockedChest on '{name}': XP reward enabled but no PlayerXPTracker found in scene.");
+            }
+        }
 
         // Setup puzzle reference
         if (puzzleComponent != null)
@@ -145,6 +165,9 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
         Debug.Log("Puzzle completed! Chest is now unlocked.");
         isUnlocked = true;
         
+        // Award XP for unlocking chest
+        AwardXPReward();
+        
         // Play unlock sound
         PlayChestSound(unlockSound);
         
@@ -162,6 +185,22 @@ public class PuzzleLockedChest : MonoBehaviour, IInteractable
 
         // Optional: Show unlock feedback
         ShowUnlockedMessage();
+    }
+    
+    private void AwardXPReward()
+    {
+        if (!awardXPOnUnlock)
+            return;
+            
+        if (xpTracker == null)
+        {
+            Debug.LogWarning($"PuzzleLockedChest on '{name}': Cannot award XP - no PlayerXPTracker assigned.");
+            return;
+        }
+        
+        string reason = string.IsNullOrEmpty(xpRewardReason) ? "Chest unlocked" : xpRewardReason;
+        xpTracker.GrantXP(xpRewardAmount, reason);
+        Debug.Log($"Awarded {xpRewardAmount} XP for unlocking chest: {reason}");
     }
     
     private void PlayOpenSoundDelayed()

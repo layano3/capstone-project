@@ -39,7 +39,7 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
     [SerializeField] private UnityEngine.Events.UnityEvent onManuallyUnlocked;
 
     [Header("Rewards")]
-    [SerializeField] private bool awardXPOnSolve = false;
+    [SerializeField] private bool awardXPOnSolve = true; // Default to true - XP is stored in database
     [SerializeField] private int xpRewardAmount = 25;
     [SerializeField] private string xpRewardReason = "Puzzle solved";
     [SerializeField] private bool awardXPOnlyOnce = true;
@@ -214,6 +214,12 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
             puzzle.ResetPuzzle();
         }
 
+        // Update activity tracker when entering puzzle
+        if (ActivityTracker.Instance != null)
+        {
+            ActivityTracker.Instance.EnterPuzzle(gameObject.name);
+        }
+        
         puzzle.ShowPuzzle(
             onComplete: OnPuzzleCompleted,
             onCancel: OnPuzzleCancelled
@@ -236,6 +242,12 @@ public class PuzzleLockedInteractable : MonoBehaviour, IInteractable
         onPuzzleCompleted?.Invoke();
 
         AwardXPReward();
+        
+        // Update activity tracker - mark puzzle as completed
+        if (ActivityTracker.Instance != null)
+        {
+            ActivityTracker.Instance.CompleteActivity(gameObject.name);
+        }
         
         // Automatically interact with the wrapped object (opens chest once)
         InteractWithWrappedObject();

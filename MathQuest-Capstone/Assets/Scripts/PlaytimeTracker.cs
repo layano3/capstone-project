@@ -17,13 +17,66 @@ public class PlaytimeTracker : MonoBehaviour
     private float lastUpdateTime;
     private int totalMinutesThisSession = 0;
     
+    void Awake()
+    {
+        // Try to find config if not set
+        if (config == null)
+        {
+            // Try to get from GameSessionManager first
+            var gameSession = FindObjectOfType<GameSessionManager>();
+            if (gameSession != null && gameSession.config != null)
+            {
+                config = gameSession.config;
+                Debug.Log("PlaytimeTracker: Found config from GameSessionManager");
+            }
+            else
+            {
+                // Try to find SupabaseConfig in resources
+                var configs = Resources.FindObjectsOfTypeAll<SupabaseConfig>();
+                if (configs != null && configs.Length > 0)
+                {
+                    config = configs[0];
+                    Debug.Log("PlaytimeTracker: Found config from Resources");
+                }
+            }
+        }
+    }
+    
     void Start()
     {
+        // Ensure config is set
+        if (config == null)
+        {
+            Debug.LogError("PlaytimeTracker: SupabaseConfig is not set! Playtime tracking disabled. Please assign config in Inspector or ensure GameSessionManager has config set.");
+            return;
+        }
+        
+        // Check for user ID
+        string userId = PlayerPrefs.GetString("CurrentUserId");
+        if (string.IsNullOrEmpty(userId))
+        {
+            Debug.LogWarning("PlaytimeTracker: No user ID found. Playtime tracking will not work until user logs in.");
+        }
+        else
+        {
+            Debug.Log($"PlaytimeTracker: Tracking playtime for user: {userId}");
+        }
+        
         sessionStartTime = Time.time;
         lastUpdateTime = Time.time;
         
+        Debug.Log($"PlaytimeTracker: Started tracking. Updates every {updateIntervalSeconds} seconds.");
+        
         // Update playtime periodically
         InvokeRepeating(nameof(UpdatePlaytime), updateIntervalSeconds, updateIntervalSeconds);
+    }
+    
+    /// <summary>
+    /// Manually trigger a playtime update (useful for testing)
+    /// </summary>
+    public void ForceUpdate()
+    {
+        UpdatePlaytime();
     }
     
     void OnApplicationQuit()
@@ -48,6 +101,12 @@ public class PlaytimeTracker : MonoBehaviour
     
     void UpdatePlaytime()
     {
+        if (config == null)
+        {
+            Debug.LogWarning("PlaytimeTracker: Config is null, cannot update playtime.");
+            return;
+        }
+        
         float currentTime = Time.time;
         float minutesSinceLastUpdate = (currentTime - lastUpdateTime) / 60f;
         
@@ -57,14 +116,25 @@ public class PlaytimeTracker : MonoBehaviour
         lastUpdateTime = currentTime;
         
         string userId = PlayerPrefs.GetString("CurrentUserId");
-        if (!string.IsNullOrEmpty(userId))
+        if (string.IsNullOrEmpty(userId))
         {
-            StartCoroutine(SendPlaytimeUpdate(userId, Mathf.RoundToInt(minutesSinceLastUpdate)));
+            Debug.LogWarning("PlaytimeTracker: No user ID found, skipping playtime update.");
+            return;
         }
+        
+        int minutesToAdd = Mathf.RoundToInt(minutesSinceLastUpdate);
+        Debug.Log($"PlaytimeTracker: Updating playtime - adding {minutesToAdd} minutes");
+        StartCoroutine(SendPlaytimeUpdate(userId, minutesToAdd));
     }
     
     IEnumerator SendPlaytimeUpdate(string studentId, int minutesToAdd)
     {
+        if (config == null)
+        {
+            Debug.LogError("PlaytimeTracker: Config is null, cannot send playtime update.");
+            yield break;
+        }
+        
         string url = $"{config.url}/rest/v1/students?id=eq.{studentId}";
         
         // Get current time_played_minutes
@@ -77,12 +147,28 @@ public class PlaytimeTracker : MonoBehaviour
             
             if (getReq.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to get current playtime: {getReq.error}");
+                Debug.LogError($"PlaytimeTracker: Failed to get current playtime: {getReq.responseCode} - {getReq.error}");
+                if (getReq.downloadHandler != null && !string.IsNullOrEmpty(getReq.downloadHandler.text))
+                {
+                    Debug.LogError($"Response: {getReq.downloadHandler.text}");
+                }
                 yield break;
             }
             
             var json = getReq.downloadHandler.text.Trim('[', ']');
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.LogError("PlaytimeTracker: Empty response when getting playtime data.");
+                yield break;
+            }
+            
             var data = JsonUtility.FromJson<PlaytimeData>(json);
+            
+            if (data == null)
+            {
+                Debug.LogError($"PlaytimeTracker: Failed to parse playtime data. JSON: {json}");
+                yield break;
+            }
             
             int newPlaytime = data.time_played_minutes + minutesToAdd;
             
@@ -99,11 +185,15 @@ public class PlaytimeTracker : MonoBehaviour
             
             if (patchReq.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log($"Updated playtime: +{minutesToAdd} min (total: {newPlaytime} min)");
+                Debug.Log($"PlaytimeTracker: Successfully updated playtime: +{minutesToAdd} min (total: {newPlaytime} min)");
             }
             else
             {
-                Debug.LogError($"Failed to update playtime: {patchReq.error}");
+                Debug.LogError($"PlaytimeTracker: Failed to update playtime: {patchReq.responseCode} - {patchReq.error}");
+                if (patchReq.downloadHandler != null && !string.IsNullOrEmpty(patchReq.downloadHandler.text))
+                {
+                    Debug.LogError($"Response: {patchReq.downloadHandler.text}");
+                }
             }
         }
     }

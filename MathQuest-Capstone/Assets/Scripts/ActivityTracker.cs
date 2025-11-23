@@ -12,6 +12,10 @@ public class ActivityTracker : MonoBehaviour
     [Header("Config")]
     public SupabaseConfig config;
     
+    [Header("Update Settings")]
+    [Tooltip("How often to update last_active timestamp (in seconds)")]
+    public float lastActiveUpdateInterval = 120f; // Update every 2 minutes
+    
     private static ActivityTracker _instance;
     public static ActivityTracker Instance
     {
@@ -34,6 +38,21 @@ public class ActivityTracker : MonoBehaviour
         }
         _instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+    
+    void Start()
+    {
+        // Periodically update last_active timestamp even if activity doesn't change
+        InvokeRepeating(nameof(UpdateLastActive), lastActiveUpdateInterval, lastActiveUpdateInterval);
+    }
+    
+    private void UpdateLastActive()
+    {
+        string userId = PlayerPrefs.GetString("CurrentUserId");
+        if (string.IsNullOrEmpty(userId)) return;
+        
+        // Just update last_active without changing activity/status
+        StartCoroutine(SendLastActiveUpdate(userId));
     }
     
     /// <summary>
@@ -130,6 +149,27 @@ public class ActivityTracker : MonoBehaviour
         else
         {
             Debug.LogError($"Failed to update activity: {patchReq.error}");
+        }
+    }
+    
+    IEnumerator SendLastActiveUpdate(string studentId)
+    {
+        string url = $"{config.url}/rest/v1/students?id=eq.{studentId}";
+        string timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+        string payload = $"{{\"last_active\":\"{timestamp}\"}}";
+        
+        using var patchReq = UnityWebRequest.Put(url, payload);
+        patchReq.method = "PATCH";
+        patchReq.SetRequestHeader("Content-Type", "application/json");
+        patchReq.SetRequestHeader("apikey", config.anonKey);
+        patchReq.SetRequestHeader("Authorization", $"Bearer {config.anonKey}");
+        patchReq.SetRequestHeader("Prefer", "return=minimal");
+        
+        yield return patchReq.SendWebRequest();
+        
+        if (patchReq.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Failed to update last_active: {patchReq.error}");
         }
     }
     

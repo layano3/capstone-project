@@ -50,6 +50,18 @@ public class PlayerXPTracker : MonoBehaviour
         {
             xpManager.config = fallbackConfig;
         }
+        
+        // Try to get student ID from PlayerPrefs if not already set
+        if (string.IsNullOrEmpty(studentId))
+        {
+            string prefStudentId = PlayerPrefs.GetString("CurrentUserId", "");
+            if (!string.IsNullOrEmpty(prefStudentId))
+            {
+                studentId = prefStudentId;
+                if (logDebugMessages)
+                    Debug.Log($"PlayerXPTracker: Loaded student ID from PlayerPrefs: {studentId}");
+            }
+        }
 
         if (setStartingXPOnAwake && !hasInitializedXP)
         {
