@@ -7,7 +7,7 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
     public AudioMixer audioMixer;
     public string musicVolumeParam = "MusicVolume";
-    public string sfxVolumeParam = "SFXVolume";
+    public string sfxVolumeParam = "MyExposedParam 1"; // Change this to "SFXVolume" if you rename the parameter in the AudioMixer
     private AudioSource musicSource;
     
     [Header("SFX Settings")]

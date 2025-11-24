@@ -11,17 +11,17 @@ public class MainMenu : MonoBehaviour
             Destroy(QuestManager.Instance.gameObject);
         }
 
-        SceneManager.LoadSceneAsync(2);
+        SceneManager.LoadSceneAsync(3);
     }
 
     public void LoadProfile()
     {
-        SceneManager.LoadSceneAsync(3);
+        SceneManager.LoadSceneAsync(4);
     }
 
     public void LoadSettings()
     {
-        SceneManager.LoadSceneAsync(4);
+        SceneManager.LoadSceneAsync(5);
     }
 
     public void BackToMainMenu()
@@ -31,12 +31,12 @@ public class MainMenu : MonoBehaviour
         {
             Destroy(QuestManager.Instance.gameObject);
         }
-        SceneManager.LoadSceneAsync(0);
+        SceneManager.LoadSceneAsync(1);
     }
 
     public void LoadGame()
     {
-        AudioManager.Instance.StopMusic();
+        // AudioManager.Instance.StopMusic();
         
         // Update activity tracker when entering game
         if (ActivityTracker.Instance != null)
@@ -44,7 +44,7 @@ public class MainMenu : MonoBehaviour
             ActivityTracker.Instance.StartExploring("GamePlay");
         }
         
-        SceneManager.LoadSceneAsync(5);
+        SceneManager.LoadSceneAsync(6);
     }
 
     

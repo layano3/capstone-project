@@ -4,7 +4,7 @@ using TMPro;
 using UserAvatar.FinalCharacterController;
 
 /// <summary>
-/// Manages the in-game settings panel with sensitivity and SFX volume controls.
+/// Manages the in-game settings panel with sensitivity, music volume, and SFX volume controls.
 /// Settings are saved to PlayerPrefs and applied immediately.
 /// </summary>
 public class SettingsPanel : MonoBehaviour
@@ -13,15 +13,18 @@ public class SettingsPanel : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private Slider sensitivityHorizontalSlider;
     [SerializeField] private Slider sensitivityVerticalSlider;
+    [SerializeField] private Slider musicVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private TMP_Text sensitivityHValueText;
     [SerializeField] private TMP_Text sensitivityVValueText;
+    [SerializeField] private TMP_Text musicVolumeValueText;
     [SerializeField] private TMP_Text sfxVolumeValueText;
     [SerializeField] private Button closeButton;
 
     [Header("Settings")]
     [SerializeField] private float defaultSensitivityH = 0.1f;
     [SerializeField] private float defaultSensitivityV = 0.1f;
+    [SerializeField] private float defaultMusicVolume = 1f;
     [SerializeField] private float defaultSFXVolume = 1f;
     [SerializeField] private float minSensitivity = 0.01f;
     [SerializeField] private float maxSensitivity = 1f;
@@ -30,6 +33,7 @@ public class SettingsPanel : MonoBehaviour
     // PlayerPrefs keys
     private const string PREF_SENSITIVITY_H = "MouseSensitivityH";
     private const string PREF_SENSITIVITY_V = "MouseSensitivityV";
+    private const string PREF_MUSIC_VOLUME = "MusicVolume";
     private const string PREF_SFX_VOLUME = "SFXVolume";
 
     private PlayerController playerController;
@@ -37,6 +41,30 @@ public class SettingsPanel : MonoBehaviour
 
     // Singleton for easy access
     public static SettingsPanel Instance { get; private set; }
+
+    /// <summary>
+    /// Gets the AudioManager instance. Since AudioManager persists from main menu,
+    /// this should always return the same instance.
+    /// </summary>
+    private AudioManager GetAudioManager()
+    {
+        // Try the cached reference first
+        if (audioManager != null)
+        {
+            return audioManager;
+        }
+
+        // Try the singleton instance (persistent from main menu)
+        if (AudioManager.Instance != null)
+        {
+            audioManager = AudioManager.Instance;
+            return audioManager;
+        }
+
+        // Fallback: search for it in the scene (shouldn't be needed if it persists)
+        audioManager = FindObjectOfType<AudioManager>();
+        return audioManager;
+    }
 
     private void Awake()
     {
@@ -60,8 +88,12 @@ public class SettingsPanel : MonoBehaviour
         // Find player controller
         playerController = FindObjectOfType<PlayerController>();
 
-        // Find audio manager
-        audioManager = AudioManager.Instance;
+        // Get the persistent AudioManager instance (created in main menu)
+        audioManager = GetAudioManager();
+        if (audioManager == null)
+        {
+            Debug.LogWarning("SettingsPanel: AudioManager not found. Music and SFX volume controls will not work. Make sure AudioManager exists in the main menu scene and persists across scenes.");
+        }
 
         // Setup sliders
         SetupSliders();
@@ -96,6 +128,16 @@ public class SettingsPanel : MonoBehaviour
             // Remove existing listeners to avoid duplicates
             sensitivityVerticalSlider.onValueChanged.RemoveAllListeners();
             sensitivityVerticalSlider.onValueChanged.AddListener(OnSensitivityVChanged);
+        }
+
+        // Music Volume slider
+        if (musicVolumeSlider != null)
+        {
+            musicVolumeSlider.minValue = 0f;
+            musicVolumeSlider.maxValue = 1f;
+            // Remove existing listeners to avoid duplicates
+            musicVolumeSlider.onValueChanged.RemoveAllListeners();
+            musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
         }
 
         // SFX Volume slider
@@ -206,14 +248,48 @@ public class SettingsPanel : MonoBehaviour
     }
 
     /// <summary>
+    /// Called when music volume slider value changes.
+    /// </summary>
+    private void OnMusicVolumeChanged(float value)
+    {
+        // Get the persistent AudioManager instance
+        AudioManager manager = GetAudioManager();
+        
+        if (manager != null)
+        {
+            manager.SetMusicVolume(value);
+        }
+        else
+        {
+            Debug.LogWarning("SettingsPanel: AudioManager not found. Cannot set music volume. Make sure AudioManager exists in the main menu scene.");
+        }
+
+        // Update display text (show as percentage)
+        if (musicVolumeValueText != null)
+        {
+            musicVolumeValueText.text = Mathf.RoundToInt(value * 100f).ToString() + "%";
+        }
+
+        // Save to PlayerPrefs
+        PlayerPrefs.SetFloat(PREF_MUSIC_VOLUME, value);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>
     /// Called when SFX volume slider value changes.
     /// </summary>
     private void OnSFXVolumeChanged(float value)
     {
-        // Apply to audio manager
-        if (audioManager != null)
+        // Get the persistent AudioManager instance
+        AudioManager manager = GetAudioManager();
+        
+        if (manager != null)
         {
-            audioManager.SetSFXVolume(value);
+            manager.SetSFXVolume(value);
+        }
+        else
+        {
+            Debug.LogWarning("SettingsPanel: AudioManager not found. Cannot set SFX volume. Make sure AudioManager exists in the main menu scene.");
         }
 
         // Update display text (show as percentage)
@@ -265,6 +341,7 @@ public class SettingsPanel : MonoBehaviour
         // Load sensitivity values
         float sensitivityH = PlayerPrefs.GetFloat(PREF_SENSITIVITY_H, defaultSensitivityH);
         float sensitivityV = PlayerPrefs.GetFloat(PREF_SENSITIVITY_V, defaultSensitivityV);
+        float musicVolume = PlayerPrefs.GetFloat(PREF_MUSIC_VOLUME, defaultMusicVolume);
         float sfxVolume = PlayerPrefs.GetFloat(PREF_SFX_VOLUME, defaultSFXVolume);
 
         // Apply to player controller
@@ -274,10 +351,12 @@ public class SettingsPanel : MonoBehaviour
             playerController.lookSenseV = sensitivityV;
         }
 
-        // Apply to audio manager
-        if (audioManager != null)
+        // Apply to audio manager using the persistent instance
+        AudioManager manager = GetAudioManager();
+        if (manager != null)
         {
-            audioManager.SetSFXVolume(sfxVolume);
+            manager.SetMusicVolume(musicVolume);
+            manager.SetSFXVolume(sfxVolume);
         }
 
         // Update sliders (multiply by sensitivityMultiplier for display)
@@ -293,6 +372,7 @@ public class SettingsPanel : MonoBehaviour
         // Load current values from PlayerPrefs
         float sensitivityH = PlayerPrefs.GetFloat(PREF_SENSITIVITY_H, defaultSensitivityH);
         float sensitivityV = PlayerPrefs.GetFloat(PREF_SENSITIVITY_V, defaultSensitivityV);
+        float musicVolume = PlayerPrefs.GetFloat(PREF_MUSIC_VOLUME, defaultMusicVolume);
         float sfxVolume = PlayerPrefs.GetFloat(PREF_SFX_VOLUME, defaultSFXVolume);
 
         // Temporarily remove listeners
@@ -308,6 +388,13 @@ public class SettingsPanel : MonoBehaviour
             sensitivityVerticalSlider.onValueChanged.RemoveListener(OnSensitivityVChanged);
             sensitivityVerticalSlider.value = sensitivityV * sensitivityMultiplier;
             sensitivityVerticalSlider.onValueChanged.AddListener(OnSensitivityVChanged);
+        }
+
+        if (musicVolumeSlider != null)
+        {
+            musicVolumeSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);
+            musicVolumeSlider.value = musicVolume;
+            musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
         }
 
         if (sfxVolumeSlider != null)
@@ -336,6 +423,11 @@ public class SettingsPanel : MonoBehaviour
             sensitivityVValueText.text = sensitivityVerticalSlider.value.ToString("F1");
         }
 
+        if (musicVolumeValueText != null && musicVolumeSlider != null)
+        {
+            musicVolumeValueText.text = Mathf.RoundToInt(musicVolumeSlider.value * 100f).ToString() + "%";
+        }
+
         if (sfxVolumeValueText != null && sfxVolumeSlider != null)
         {
             sfxVolumeValueText.text = Mathf.RoundToInt(sfxVolumeSlider.value * 100f).ToString() + "%";
@@ -358,6 +450,11 @@ public class SettingsPanel : MonoBehaviour
             sensitivityVerticalSlider.value = defaultSensitivityV * sensitivityMultiplier;
         }
 
+        if (musicVolumeSlider != null)
+        {
+            musicVolumeSlider.value = defaultMusicVolume;
+        }
+
         if (sfxVolumeSlider != null)
         {
             sfxVolumeSlider.value = defaultSFXVolume;
@@ -366,6 +463,7 @@ public class SettingsPanel : MonoBehaviour
         // Save defaults
         PlayerPrefs.SetFloat(PREF_SENSITIVITY_H, defaultSensitivityH);
         PlayerPrefs.SetFloat(PREF_SENSITIVITY_V, defaultSensitivityV);
+        PlayerPrefs.SetFloat(PREF_MUSIC_VOLUME, defaultMusicVolume);
         PlayerPrefs.SetFloat(PREF_SFX_VOLUME, defaultSFXVolume);
         PlayerPrefs.Save();
     }
