@@ -105,34 +105,51 @@ public class PlayerXPTracker : MonoBehaviour
     }
 
     /// <summary>
-    /// Grants XP, updates HUD, and reports to Supabase.
+    /// Grants or deducts XP, updates HUD, and reports to Supabase.
+    /// Supports negative amounts for XP deduction.
     /// </summary>
     public void GrantXP(int amount, string reason = "Puzzle solved")
     {
         if (amount == 0)
             return;
 
-        if (amount < 0)
-        {
-            if (logDebugMessages)
-                Debug.LogWarning($"PlayerXPTracker: Negative XP ({amount}) ignored.");
-            return;
-        }
-
+        // Allow negative values for XP deduction (but ensure XP doesn't go below 0)
         int previousLevel = LevelCalculator.CalculateLevel(currentXP);
-        currentXP += amount;
-        ApplyXPToDisplay();
-
-        onXPChanged?.Invoke(currentXP);
-
-        int newLevel = LevelCalculator.CalculateLevel(currentXP);
-        if (newLevel > previousLevel)
+        int previousXP = currentXP;
+        int actualDelta = amount;
+        
+        // Calculate what the XP would be before clamping
+        int newXPValue = currentXP + amount;
+        currentXP = Mathf.Max(0, newXPValue); // Prevent XP from going below 0
+        
+        // If XP was clamped to 0, adjust the delta to reflect actual change for display
+        // But still send the original amount to database to track the penalty attempt
+        if (currentXP == 0 && newXPValue < 0)
         {
-            onLevelUp?.Invoke(newLevel);
+            // For local tracking, use the actual amount deducted (clamped)
+            actualDelta = -previousXP;
+            if (logDebugMessages)
+                Debug.Log($"PlayerXPTracker: XP deduction ({amount}) would result in negative XP. Current XP: {previousXP}. Deducting {previousXP} XP (clamped to 0). Penalty still recorded in database.");
         }
 
+        // Only update display if XP actually changed locally
+        if (currentXP != previousXP)
+        {
+            ApplyXPToDisplay();
+            onXPChanged?.Invoke(currentXP);
+
+            int newLevel = LevelCalculator.CalculateLevel(currentXP);
+            if (newLevel > previousLevel)
+            {
+                onLevelUp?.Invoke(newLevel);
+            }
+        }
+
+        // ALWAYS send the ORIGINAL amount to database to track penalties
+        // This ensures penalties are recorded even if player has insufficient XP
         if (!string.IsNullOrEmpty(studentId) && xpManager != null && xpManager.config != null)
         {
+            // Use original amount for database (not the clamped actualDelta)
             StartCoroutine(ReportXPDelta(amount, reason));
         }
         else if (logDebugMessages)
@@ -153,6 +170,13 @@ public class PlayerXPTracker : MonoBehaviour
     {
         bool completed = false;
         string backendError = null;
+        
+        // Log what we're sending
+        if (logDebugMessages || amount < 0)
+        {
+            string xpType = amount >= 0 ? "XP gain" : "XP penalty";
+            Debug.Log($"PlayerXPTracker: Reporting {xpType} - Amount: {amount}, Reason: {reason}");
+        }
 
         yield return xpManager.AddXpEvent(studentId, amount, reason, updatedBy, (error) =>
         {

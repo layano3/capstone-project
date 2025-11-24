@@ -38,11 +38,21 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
     [Tooltip("If true, select a random custom question each time. If false, the list is used in order.")]
     [SerializeField] private bool randomizeCustomQuestions = false;
 
+    [Header("XP Penalty Settings")]
+    [Tooltip("Enable XP penalty after multiple wrong attempts")]
+    [SerializeField] private bool enableXPPenalty = true;
+    [Tooltip("Number of wrong attempts before XP penalty")]
+    [SerializeField] private int wrongAttemptsBeforePenalty = 3;
+    [Tooltip("Amount of XP to deduct after penalty threshold")]
+    [SerializeField] private int xpPenaltyAmount = 10;
+    
     private int correctAnswer;
     private Action onCompleteCallback;
     private Action onCancelCallback;
     private bool isCompleted;
     private int sequentialQuestionIndex;
+    private int wrongAttemptCount = 0; // Track wrong attempts for current question
+    private bool penaltyApplied = false; // Track if penalty has been applied for this puzzle session
 
     public bool IsActive => puzzlePanel != null && puzzlePanel.activeSelf;
     public bool IsCompleted => isCompleted;
@@ -67,6 +77,10 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
     {
         onCompleteCallback = onComplete;
         onCancelCallback = onCancel;
+
+        // Reset wrong attempt count and penalty flag when showing a new puzzle
+        wrongAttemptCount = 0;
+        penaltyApplied = false;
 
         GenerateQuestion();
         
@@ -97,6 +111,8 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
     {
         isCompleted = false;
         correctAnswer = 0;
+        wrongAttemptCount = 0; // Reset wrong attempts when puzzle is reset
+        penaltyApplied = false; // Reset penalty flag when puzzle is reset
         // Don't reset sequentialQuestionIndex - keep it global so questions advance across all interactables
         if (answerInput) answerInput.text = "";
         if (feedbackText) feedbackText.text = "";
@@ -220,6 +236,8 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
             {
                 ShowFeedback("Correct! Unlocking...", Color.green);
                 isCompleted = true;
+                wrongAttemptCount = 0; // Reset wrong attempts on correct answer
+                penaltyApplied = false; // Reset penalty flag on correct answer
                 
                 // Advance to next question for next time
                 if (useCustomQuestions && customQuestions != null && customQuestions.Length > 0)
@@ -231,7 +249,20 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
             }
             else
             {
-                ShowFeedback("Incorrect! Try again.", Color.red);
+                wrongAttemptCount++;
+                
+                // Check if XP penalty should be applied
+                if (enableXPPenalty && wrongAttemptCount >= wrongAttemptsBeforePenalty)
+                {
+                    DeductXPForWrongAttempts();
+                }
+                
+                // Show feedback with attempt count
+                string feedbackMessage = wrongAttemptCount >= wrongAttemptsBeforePenalty
+                    ? $"Incorrect! ({wrongAttemptCount} attempts) - XP penalty applied. Try again."
+                    : $"Incorrect! Try again. ({wrongAttemptCount}/{wrongAttemptsBeforePenalty} attempts)";
+                
+                ShowFeedback(feedbackMessage, wrongAttemptCount >= wrongAttemptsBeforePenalty ? Color.red : new Color(1f, 0.5f, 0f)); // Orange for warning, red for penalty
                 answerInput.text = "";
                 answerInput.Select();
                 answerInput.ActivateInputField();
@@ -264,6 +295,31 @@ public class SimpleMathPuzzle : MonoBehaviour, IPuzzle
         {
             feedbackText.text = message;
             feedbackText.color = color;
+        }
+    }
+    
+    private void DeductXPForWrongAttempts()
+    {
+        // Only deduct once when threshold is reached and penalty hasn't been applied yet
+        if (wrongAttemptCount >= wrongAttemptsBeforePenalty && !penaltyApplied)
+        {
+            penaltyApplied = true; // Mark penalty as applied to prevent duplicate deductions
+            
+            var xpTracker = FindObjectOfType<PlayerXPTracker>();
+            if (xpTracker != null)
+            {
+                string penaltyReason = $"Penalty: {wrongAttemptsBeforePenalty} wrong attempts on puzzle";
+                Debug.Log($"SimpleMathPuzzle: Deducting {xpPenaltyAmount} XP - {penaltyReason} (Attempt #{wrongAttemptCount})");
+                xpTracker.GrantXP(-xpPenaltyAmount, penaltyReason);
+            }
+            else
+            {
+                Debug.LogError("SimpleMathPuzzle: Cannot deduct XP - PlayerXPTracker not found in scene!");
+            }
+        }
+        else if (penaltyApplied)
+        {
+            Debug.Log($"SimpleMathPuzzle: Penalty already applied for this puzzle session. Skipping duplicate deduction.");
         }
     }
 }

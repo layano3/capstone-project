@@ -59,7 +59,14 @@ namespace Supabase {
                 yield break;
             }
 
-            Debug.Log($"Added {delta} XP for reason: {reason}");
+            if (delta >= 0)
+            {
+                Debug.Log($"Added {delta} XP for reason: {reason}");
+            }
+            else
+            {
+                Debug.Log($"Deducted {Mathf.Abs(delta)} XP for reason: {reason}");
+            }
             callback?.Invoke(null);
         }
 

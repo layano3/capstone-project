@@ -517,8 +517,9 @@ public class ProfileController : MonoBehaviour
         layout.padding = new RectOffset(20, 20, 15, 15); // Reduced padding to maximize space for reason
         layout.childAlignment = TextAnchor.MiddleLeft;
         
-        // Left section: XP Badge
-        CreateXPBadge(card, "+" + xpEvent.delta);
+        // Left section: XP Badge (handle negative values for penalties)
+        string xpDisplayText = xpEvent.delta >= 0 ? $"+{xpEvent.delta}" : xpEvent.delta.ToString();
+        CreateXPBadge(card, xpDisplayText, xpEvent.delta < 0);
         
         // Middle section: Reason (flexible width)
         CreateReasonSection(card, xpEvent.reason);
@@ -529,16 +530,23 @@ public class ProfileController : MonoBehaviour
         Debug.Log($"Card created: {card.name}");
     }
     
-    void CreateXPBadge(GameObject parent, string xpValue)
+    void CreateXPBadge(GameObject parent, string xpValue, bool isPenalty = false)
     {
         // Badge container
         GameObject badgeContainer = new GameObject("XPBadge");
         var badgeRect = badgeContainer.AddComponent<RectTransform>();
         badgeContainer.transform.SetParent(parent.transform, false);
         
-        // Badge background
+        // Badge background - red/orange for penalties, yellow/gold for gains
         var badgeBg = badgeContainer.AddComponent<UnityEngine.UI.Image>();
-        badgeBg.color = new Color(0.95f, 0.85f, 0.3f, 0.9f); // Yellow/gold badge
+        if (isPenalty)
+        {
+            badgeBg.color = new Color(0.9f, 0.3f, 0.3f, 0.9f); // Red badge for penalties
+        }
+        else
+        {
+            badgeBg.color = new Color(0.95f, 0.85f, 0.3f, 0.9f); // Yellow/gold badge for gains
+        }
         
         // Set badge size - compact badge to maximize space for reason
         var badgeLayout = badgeContainer.AddComponent<LayoutElement>();
@@ -562,7 +570,17 @@ public class ProfileController : MonoBehaviour
         tmp.text = xpValue;
         tmp.fontSize = 36; // Larger font
         tmp.fontStyle = FontStyles.Bold;
-        tmp.color = new Color(0.3f, 0.2f, 0.05f, 1f); // Dark brown/amber text for contrast on yellow
+        
+        // Different text colors for penalties vs gains
+        if (isPenalty)
+        {
+            tmp.color = new Color(1f, 0.95f, 0.95f, 1f); // Light/white text for contrast on red
+        }
+        else
+        {
+            tmp.color = new Color(0.3f, 0.2f, 0.05f, 1f); // Dark brown/amber text for contrast on yellow
+        }
+        
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.verticalAlignment = VerticalAlignmentOptions.Middle;
         tmp.overflowMode = TextOverflowModes.Overflow;

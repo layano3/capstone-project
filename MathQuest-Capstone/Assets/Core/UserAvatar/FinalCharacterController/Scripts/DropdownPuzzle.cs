@@ -58,11 +58,22 @@ public class DropdownPuzzle : MonoBehaviour, IPuzzle
     [Tooltip("Seconds to wait after a correct answer before completing the puzzle.")]
     [SerializeField] private float completionDelay = 0.4f;
 
+    [Header("XP Penalty Settings")]
+    [Tooltip("Enable XP penalty after multiple wrong attempts")]
+    [SerializeField] private bool enableXPPenalty = true;
+    [Tooltip("Number of wrong attempts before XP penalty")]
+    [SerializeField] private int wrongAttemptsBeforePenalty = 3;
+    [Tooltip("Amount of XP to deduct after penalty threshold")]
+    [SerializeField] private int xpPenaltyAmount = 10;
+
     private Action onCompleteCallback;
     private Action onCancelCallback;
     private bool isCompleted;
     private int sequentialQuestionIndex;
     private DropdownQuestion currentQuestion;
+    private int wrongAttemptCount = 0; // Track wrong attempts for current question
+    private bool penaltyApplied = false; // Track if penalty has been applied for this puzzle session
+    private PlayerXPTracker xpTracker; // Cache the XP tracker for better performance
 
     public bool IsActive => puzzlePanel != null && puzzlePanel.activeSelf;
     public bool IsCompleted => isCompleted;
@@ -76,6 +87,13 @@ public class DropdownPuzzle : MonoBehaviour, IPuzzle
 
         if (cancelButton != null)
             cancelButton.onClick.AddListener(OnCancelClicked);
+        
+        // Cache the XP tracker for better performance
+        xpTracker = FindObjectOfType<PlayerXPTracker>();
+        if (xpTracker == null && enableXPPenalty)
+        {
+            Debug.LogWarning("DropdownPuzzle: PlayerXPTracker not found in scene. XP penalties will not work!");
+        }
     }
 
     public void ShowPuzzle(Action onComplete, Action onCancel)
@@ -83,6 +101,12 @@ public class DropdownPuzzle : MonoBehaviour, IPuzzle
         onCompleteCallback = onComplete;
         onCancelCallback = onCancel;
         isCompleted = false;
+        
+        // Reset wrong attempt count and penalty flag when showing a new puzzle
+        wrongAttemptCount = 0;
+        penaltyApplied = false;
+        
+        Debug.Log($"DropdownPuzzle: Showing puzzle. XP penalty enabled: {enableXPPenalty}, threshold: {wrongAttemptsBeforePenalty}, amount: {xpPenaltyAmount}");
 
         if (questions == null || questions.Length == 0)
         {
@@ -112,6 +136,8 @@ public class DropdownPuzzle : MonoBehaviour, IPuzzle
     public void ResetPuzzle()
     {
         isCompleted = false;
+        wrongAttemptCount = 0; // Reset wrong attempts when puzzle is reset
+        penaltyApplied = false; // Reset penalty flag when puzzle is reset
         // Don't reset sequentialQuestionIndex - keep it global so questions advance across all interactables
         if (feedbackText) feedbackText.text = "";
         HidePuzzle();
@@ -290,13 +316,77 @@ public class DropdownPuzzle : MonoBehaviour, IPuzzle
         }
         else
         {
-            ShowFeedback("Incorrect! Please check your selections and try again.", Color.red);
+            HandleIncorrectAnswer();
+        }
+    }
+    
+    private void HandleIncorrectAnswer()
+    {
+        wrongAttemptCount++;
+        Debug.Log($"DropdownPuzzle: Wrong attempt #{wrongAttemptCount} (threshold: {wrongAttemptsBeforePenalty}, penalty enabled: {enableXPPenalty})");
+        
+        // Check if XP penalty should be applied
+        if (enableXPPenalty && wrongAttemptCount >= wrongAttemptsBeforePenalty)
+        {
+            Debug.Log($"DropdownPuzzle: Threshold reached! Attempting to apply penalty. Penalty already applied: {penaltyApplied}");
+            DeductXPForWrongAttempts();
+        }
+        else if (!enableXPPenalty)
+        {
+            Debug.LogWarning($"DropdownPuzzle: XP penalty is disabled! Enable it in the Inspector.");
+        }
+        
+        // Show feedback with attempt count
+        string feedbackMessage = wrongAttemptCount >= wrongAttemptsBeforePenalty
+            ? $"Incorrect! ({wrongAttemptCount} attempts) - XP penalty applied. Please check your selections and try again."
+            : $"Incorrect! Please check your selections and try again. ({wrongAttemptCount}/{wrongAttemptsBeforePenalty} attempts)";
+        
+        Color feedbackColor = wrongAttemptCount >= wrongAttemptsBeforePenalty 
+            ? Color.red 
+            : new Color(1f, 0.5f, 0f); // Orange for warning, red for penalty
+        
+        ShowFeedback(feedbackMessage, feedbackColor);
+    }
+    
+    private void DeductXPForWrongAttempts()
+    {
+        // Only deduct once when threshold is reached and penalty hasn't been applied yet
+        if (wrongAttemptCount >= wrongAttemptsBeforePenalty && !penaltyApplied)
+        {
+            penaltyApplied = true; // Mark penalty as applied to prevent duplicate deductions
+            
+            // Use cached tracker, or try to find it if not cached
+            if (xpTracker == null)
+            {
+                xpTracker = FindObjectOfType<PlayerXPTracker>();
+            }
+            
+            if (xpTracker != null)
+            {
+                string penaltyReason = $"Penalty: {wrongAttemptsBeforePenalty} wrong attempts on puzzle: {gameObject.name}";
+                Debug.Log($"DropdownPuzzle: Deducting {xpPenaltyAmount} XP - {penaltyReason} (Attempt #{wrongAttemptCount})");
+                xpTracker.GrantXP(-xpPenaltyAmount, penaltyReason);
+            }
+            else
+            {
+                Debug.LogError($"DropdownPuzzle: Cannot deduct XP - PlayerXPTracker not found in scene! Penalty will not be recorded in database.");
+            }
+        }
+        else if (penaltyApplied)
+        {
+            Debug.Log($"DropdownPuzzle: Penalty already applied for this puzzle session. Skipping duplicate deduction.");
+        }
+        else
+        {
+            Debug.LogWarning($"DropdownPuzzle: DeductXPForWrongAttempts called but conditions not met: wrongAttemptCount={wrongAttemptCount}, threshold={wrongAttemptsBeforePenalty}, penaltyApplied={penaltyApplied}");
         }
     }
 
     private void HandleCorrectAnswer()
     {
         isCompleted = true;
+        wrongAttemptCount = 0; // Reset wrong attempts on correct answer
+        penaltyApplied = false; // Reset penalty flag on correct answer
         ShowFeedback("Correct! Unlocking...", Color.green);
         SetDropdownInteractivity(false);
         
