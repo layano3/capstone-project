@@ -4251,6 +4251,10 @@ MonoBehaviour:
   puzzleSolvedSound: {fileID: 0}
   useAudioManager: 1
   playSounds: 1
+  xpGainVFX: {fileID: 0}
+  puzzleSolvedVFX: {fileID: 0}
+  spawnVFX: 1
+  vfxOffset: {x: 0, y: 1.5, z: 0}
 --- !u!114 &463042240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11795,6 +11799,10 @@ MonoBehaviour:
   puzzleSolvedSound: {fileID: 8300000, guid: 0c008ee3ee72a4362a35be25fa5de043, type: 3}
   useAudioManager: 1
   playSounds: 1
+  xpGainVFX: {fileID: 0}
+  puzzleSolvedVFX: {fileID: 0}
+  spawnVFX: 1
+  vfxOffset: {x: 0, y: 1.5, z: 0}
 --- !u!1 &1403187400 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1065598806034482305, guid: fdc8fc6e42a289a41a47a11a9d9e4ece, type: 3}
@@ -13289,6 +13297,11 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: b086ef986ba91794d888e0915ed20e45, type: 3}
+--- !u!4 &1599821851 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4993132628614799920, guid: e3ef7b74c8079ab439e314a75fc5236b, type: 3}
+  m_PrefabInstance: {fileID: 1024316895}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1601387723
 GameObject:
   m_ObjectHideFlags: 0
@@ -13905,6 +13918,14 @@ MonoBehaviour:
   onXPChanged:
     m_PersistentCalls:
       m_Calls: []
+  xpGainVFX: {fileID: 3280519133390621005, guid: a71be3e7990efb040a07565c43cbb198, type: 3}
+  xpDeductionVFX: {fileID: 2504214343621411470, guid: 3ed0d324122d7b24eaec75c55c74aafc, type: 3}
+  levelUpVFX: {fileID: 0}
+  spawnVFX: 1
+  xpGainVFXOffset: {x: 0, y: 0, z: 0}
+  xpDeductionVFXOffset: {x: 0, y: 1, z: 0}
+  levelUpVFXOffset: {x: 0, y: 0, z: 0}
+  playerTransformOverride: {fileID: 1599821851}
 --- !u!114 &1718478835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17582,6 +17603,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2128812774}
   m_CullTransparentMesh: 1
+--- !u!1 &2130836728
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2130836730}
+  - component: {fileID: 2130836729}
+  m_Layer: 0
+  m_Name: VFXManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2130836729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130836728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13882a5289724c447b3ffaf946089b6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialPoolSize: 10
+  vfxParent: {fileID: 0}
+--- !u!4 &2130836730
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130836728}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 665.7379, y: 330.46204, z: -33.47149}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -17598,3 +17665,4 @@ SceneRoots:
   - {fileID: 825272513}
   - {fileID: 1052120845}
   - {fileID: 1757467180}
+  - {fileID: 2130836730}

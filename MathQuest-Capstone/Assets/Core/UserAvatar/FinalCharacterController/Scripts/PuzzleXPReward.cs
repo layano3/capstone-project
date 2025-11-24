@@ -18,6 +18,12 @@ public class PuzzleXPReward : MonoBehaviour
     [SerializeField] private bool useAudioManager = true;
     [SerializeField] private bool playSounds = true;
 
+    [Header("VFX (Optional)")]
+    [SerializeField] private GameObject xpGainVFX;
+    [SerializeField] private GameObject puzzleSolvedVFX;
+    [SerializeField] private bool spawnVFX = true;
+    [SerializeField] private Vector3 vfxOffset = Vector3.up * 1.5f; // Spawn above puzzle/interactable by default
+
     private bool hasAwarded;
 
     private void Awake()
@@ -44,6 +50,9 @@ public class PuzzleXPReward : MonoBehaviour
         
         // Play sound effect
         PlayXPSound();
+        
+        // Spawn visual effect
+        SpawnXPVFX();
     }
     
     private void PlayXPSound()
@@ -69,6 +78,29 @@ public class PuzzleXPReward : MonoBehaviour
             {
                 audioSource.PlayOneShot(soundToPlay, 0.7f);
             }
+        }
+    }
+
+    private void SpawnXPVFX()
+    {
+        if (!spawnVFX) return;
+        
+        // Prefer puzzle solved VFX if available, otherwise use generic XP gain VFX
+        GameObject vfxToSpawn = puzzleSolvedVFX != null ? puzzleSolvedVFX : xpGainVFX;
+        
+        if (vfxToSpawn == null) return;
+        
+        Vector3 spawnPosition = transform.position + vfxOffset;
+        
+        if (VFXManager.Instance != null)
+        {
+            VFXManager.Instance.SpawnVFX(vfxToSpawn, spawnPosition, Quaternion.identity, null, 3f);
+        }
+        else
+        {
+            // Fallback: instantiate directly if VFXManager is not available
+            GameObject instance = Instantiate(vfxToSpawn, spawnPosition, Quaternion.identity);
+            Destroy(instance, 3f);
         }
     }
 
