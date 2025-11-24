@@ -88,6 +88,39 @@ export default function Page() {
     }
   };
 
+  const handleLogNote = async (studentId: string, note: string) => {
+    setSavingIds((prev) => new Set(prev).add(studentId));
+    try {
+      const response = await fetch(`/api/students/${studentId}/notes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ note, updatedBy: "Ms. Seguin" }),
+      });
+
+      const payload = (await response.json()) as { student?: Student; error?: string };
+
+      if (!response.ok || !payload.student) {
+        throw new Error(payload.error ?? "Failed to add note");
+      }
+
+      setRoster((prev) =>
+        prev.map((item) => (item.id === payload.student!.id ? payload.student! : item))
+      );
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Failed to add note");
+      throw err;
+    } finally {
+      setSavingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(studentId);
+        return next;
+      });
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -102,7 +135,12 @@ export default function Page() {
 
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <ActivityOverview students={roster} />
-          <QuickActions />
+          <QuickActions
+            students={roster}
+            selectedId={selectedId}
+            onAddNote={handleLogNote}
+            savingIds={savingIds}
+          />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.8fr_1fr]">

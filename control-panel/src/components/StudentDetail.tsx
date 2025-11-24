@@ -21,7 +21,7 @@ export function StudentDetail({ student }: StudentDetailProps) {
   const progress = Math.min(100, Math.round((student.xp / student.xpGoal) * 100));
 
   return (
-    <aside className="card flex h-full flex-col p-6">
+    <aside className="card flex h-full min-w-0 flex-col p-6">
       <header className="flex items-center gap-3">
         <span
           className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-semibold text-white"
@@ -40,7 +40,7 @@ export function StudentDetail({ student }: StudentDetailProps) {
         </div>
       </header>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Metric label="Total XP" value={student.xp.toLocaleString()} icon={Award} />
         <Metric label="Current streak" value={`${student.streakDays} days`} icon={Flame} />
         <Metric label="Playtime" value={formatMinutes(student.timePlayedMinutes)} icon={Clock} />
@@ -61,25 +61,32 @@ export function StudentDetail({ student }: StudentDetailProps) {
       </div>
 
       <section className="mt-6 flex-1 overflow-hidden">
-        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Recent XP events</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Recent XP events & notes</p>
         <ul className="mt-3 space-y-3 overflow-y-auto pr-2">
           {student.xpEvents.map((event) => (
             <li key={event.id} className="rounded-2xl border border-white/5 bg-slate-900/60 p-4">
-              <div className="flex items-center justify-between gap-3 text-sm">
-                <p className="font-semibold text-slate-100">{event.reason}</p>
-                <span
-                  className="rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{
-                    backgroundColor: event.delta >= 0 ? "rgba(34,197,94,0.15)" : "rgba(248,113,113,0.15)",
-                    color: event.delta >= 0 ? "#4ADE80" : "#FCA5A5",
-                  }}
-                >
-                  {event.delta >= 0 ? "+" : ""}
-                  {event.delta} XP
-                </span>
-              </div>
+              {(() => {
+                const isNote = event.delta === 0;
+                const badgeColors = isNote
+                  ? { backgroundColor: "rgba(59,130,246,0.15)", color: "#BFDBFE" }
+                  : event.delta >= 0
+                    ? { backgroundColor: "rgba(34,197,94,0.15)", color: "#4ADE80" }
+                    : { backgroundColor: "rgba(248,113,113,0.15)", color: "#FCA5A5" };
+
+                return (
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <p className="font-semibold text-slate-100">{event.reason}</p>
+                    <span
+                      className="rounded-full px-3 py-1 text-xs font-semibold"
+                      style={badgeColors}
+                    >
+                      {isNote ? "Note" : `${event.delta >= 0 ? "+" : ""}${event.delta} XP`}
+                    </span>
+                  </div>
+                );
+              })()}
               <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
-                <p>Logged by {event.updatedBy}</p>
+                <p>{event.delta === 0 ? "Noted by" : "Logged by"} {event.updatedBy}</p>
                 <p>{formatRelativeTime(event.timestamp)}</p>
               </div>
             </li>
