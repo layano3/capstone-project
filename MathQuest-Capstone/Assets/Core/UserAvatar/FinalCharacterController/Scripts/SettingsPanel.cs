@@ -83,6 +83,8 @@ public class SettingsPanel : MonoBehaviour
         {
             sensitivityHorizontalSlider.minValue = minSensitivity * sensitivityMultiplier;
             sensitivityHorizontalSlider.maxValue = maxSensitivity * sensitivityMultiplier;
+            // Remove existing listeners to avoid duplicates
+            sensitivityHorizontalSlider.onValueChanged.RemoveAllListeners();
             sensitivityHorizontalSlider.onValueChanged.AddListener(OnSensitivityHChanged);
         }
 
@@ -91,6 +93,8 @@ public class SettingsPanel : MonoBehaviour
         {
             sensitivityVerticalSlider.minValue = minSensitivity * sensitivityMultiplier;
             sensitivityVerticalSlider.maxValue = maxSensitivity * sensitivityMultiplier;
+            // Remove existing listeners to avoid duplicates
+            sensitivityVerticalSlider.onValueChanged.RemoveAllListeners();
             sensitivityVerticalSlider.onValueChanged.AddListener(OnSensitivityVChanged);
         }
 
@@ -99,6 +103,8 @@ public class SettingsPanel : MonoBehaviour
         {
             sfxVolumeSlider.minValue = 0f;
             sfxVolumeSlider.maxValue = 1f;
+            // Remove existing listeners to avoid duplicates
+            sfxVolumeSlider.onValueChanged.RemoveAllListeners();
             sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
         }
     }
@@ -111,7 +117,7 @@ public class SettingsPanel : MonoBehaviour
         if (settingsPanel != null)
         {
             settingsPanel.SetActive(true);
-            LoadSettings(); // Refresh displayed values
+            RefreshDisplayedValues(); // Refresh displayed values without triggering listeners
         }
     }
 
@@ -124,6 +130,14 @@ public class SettingsPanel : MonoBehaviour
         {
             settingsPanel.SetActive(false);
         }
+    }
+    
+    /// <summary>
+    /// Gets the settings panel GameObject (the container).
+    /// </summary>
+    public GameObject GetSettingsContainer()
+    {
+        return settingsPanel;
     }
 
     /// <summary>
@@ -218,17 +232,33 @@ public class SettingsPanel : MonoBehaviour
     /// </summary>
     private void OnCloseClicked()
     {
+        // Hide settings panel
         HidePanel();
 
-        // If pause menu is open, return to it
-        if (PauseMenuManager.Instance != null && PauseMenuManager.Instance.IsPaused)
+        // Show pause menu again if game is still paused
+        if (PauseMenuManager.Instance != null)
         {
-            // Settings panel is closed, pause menu should remain open
+            if (PauseMenuManager.Instance.IsPaused)
+            {
+                PauseMenuManager.Instance.ShowPauseMenu();
+            }
         }
+        else
+        {
+            Debug.LogWarning("SettingsPanel: PauseMenuManager.Instance is null. Cannot return to pause menu.");
+        }
+    }
+    
+    /// <summary>
+    /// Public method to handle close button - can be called from Unity Events.
+    /// </summary>
+    public void OnCloseButtonClicked()
+    {
+        OnCloseClicked();
     }
 
     /// <summary>
-    /// Loads settings from PlayerPrefs and applies them.
+    /// Loads settings from PlayerPrefs and applies them (called on Start).
     /// </summary>
     private void LoadSettings()
     {
@@ -251,19 +281,40 @@ public class SettingsPanel : MonoBehaviour
         }
 
         // Update sliders (multiply by sensitivityMultiplier for display)
+        // Temporarily remove listeners to avoid triggering callbacks
+        RefreshDisplayedValues();
+    }
+
+    /// <summary>
+    /// Refreshes displayed values without triggering change listeners.
+    /// </summary>
+    private void RefreshDisplayedValues()
+    {
+        // Load current values from PlayerPrefs
+        float sensitivityH = PlayerPrefs.GetFloat(PREF_SENSITIVITY_H, defaultSensitivityH);
+        float sensitivityV = PlayerPrefs.GetFloat(PREF_SENSITIVITY_V, defaultSensitivityV);
+        float sfxVolume = PlayerPrefs.GetFloat(PREF_SFX_VOLUME, defaultSFXVolume);
+
+        // Temporarily remove listeners
         if (sensitivityHorizontalSlider != null)
         {
+            sensitivityHorizontalSlider.onValueChanged.RemoveListener(OnSensitivityHChanged);
             sensitivityHorizontalSlider.value = sensitivityH * sensitivityMultiplier;
+            sensitivityHorizontalSlider.onValueChanged.AddListener(OnSensitivityHChanged);
         }
 
         if (sensitivityVerticalSlider != null)
         {
+            sensitivityVerticalSlider.onValueChanged.RemoveListener(OnSensitivityVChanged);
             sensitivityVerticalSlider.value = sensitivityV * sensitivityMultiplier;
+            sensitivityVerticalSlider.onValueChanged.AddListener(OnSensitivityVChanged);
         }
 
         if (sfxVolumeSlider != null)
         {
+            sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
             sfxVolumeSlider.value = sfxVolume;
+            sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
         }
 
         // Update display texts

@@ -15,6 +15,12 @@ public class PauseMenuManager : MonoBehaviour
     [SerializeField] private Button unstuckButton;
     [SerializeField] private Button resumeButton;
 
+    [Header("Menu Containers")]
+    [Tooltip("The container with pause menu buttons (Main Menu, Settings, Unstuck, Resume)")]
+    [SerializeField] private GameObject menuContainer;
+    [Tooltip("The settings panel container (nested inside pause menu panel)")]
+    [SerializeField] private GameObject settingsContainer;
+
     [Header("Settings Panel")]
     [SerializeField] private SettingsPanel settingsPanel;
 
@@ -74,6 +80,44 @@ public class PauseMenuManager : MonoBehaviour
         {
             settingsPanel = FindObjectOfType<SettingsPanel>();
         }
+        
+        // Auto-find containers if not assigned
+        if (menuContainer == null && pauseMenuPanel != null)
+        {
+            // Try to find MenuContainer as a child of pauseMenuPanel
+            Transform menuContainerTransform = pauseMenuPanel.transform.Find("MenuContainer");
+            if (menuContainerTransform != null)
+            {
+                menuContainer = menuContainerTransform.gameObject;
+            }
+        }
+        
+        if (settingsContainer == null)
+        {
+            // Try to find SettingsPanel GameObject (the container, not the component)
+            if (settingsPanel != null)
+            {
+                settingsContainer = settingsPanel.gameObject;
+            }
+            else if (pauseMenuPanel != null)
+            {
+                Transform settingsTransform = pauseMenuPanel.transform.Find("SettingsPanel");
+                if (settingsTransform != null)
+                {
+                    settingsContainer = settingsTransform.gameObject;
+                }
+            }
+        }
+        
+        // Ensure initial state: menu container visible, settings container hidden
+        if (menuContainer != null)
+        {
+            menuContainer.SetActive(true);
+        }
+        if (settingsContainer != null)
+        {
+            settingsContainer.SetActive(false);
+        }
     }
 
     private void Update()
@@ -81,10 +125,10 @@ public class PauseMenuManager : MonoBehaviour
         // Check for Escape key press
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // If settings panel is open, close it instead of resuming
-            if (settingsPanel != null && settingsPanel.IsVisible())
+            // If settings container is visible, close it and return to menu
+            if (settingsContainer != null && settingsContainer.activeSelf)
             {
-                settingsPanel.HidePanel();
+                ShowPauseMenu(); // This will hide settings and show menu
                 return;
             }
 
@@ -136,6 +180,34 @@ public class PauseMenuManager : MonoBehaviour
 
         // Disable player input (optional - depends on your input system)
         DisablePlayerInput();
+    }
+
+    /// <summary>
+    /// Shows the pause menu panel (used when returning from settings).
+    /// </summary>
+    public void ShowPauseMenu()
+    {
+        if (!isPaused) 
+        {
+            Debug.LogWarning("PauseMenuManager: Cannot show pause menu - game is not paused.");
+            return; // Only show if game is paused
+        }
+
+        // Hide settings container and show menu container
+        if (settingsContainer != null)
+        {
+            settingsContainer.SetActive(false);
+        }
+        
+        if (menuContainer != null)
+        {
+            menuContainer.SetActive(true);
+            Debug.Log("PauseMenuManager: Menu container shown.");
+        }
+        else
+        {
+            Debug.LogError("PauseMenuManager: menuContainer is null. Cannot show pause menu.");
+        }
     }
 
     /// <summary>
@@ -195,13 +267,37 @@ public class PauseMenuManager : MonoBehaviour
     /// </summary>
     private void OnSettingsClicked()
     {
+        ShowSettings();
+    }
+    
+    /// <summary>
+    /// Public method to show settings - can be called from Unity Events.
+    /// </summary>
+    public void ShowSettings()
+    {
         if (settingsPanel != null)
         {
-            // Hide pause menu and show settings panel
-            if (pauseMenuPanel != null)
+            // Hide menu container and show settings container
+            if (menuContainer != null)
             {
-                pauseMenuPanel.SetActive(false);
+                menuContainer.SetActive(false);
+                Debug.Log("PauseMenuManager: Menu container hidden.");
             }
+            
+            if (settingsContainer != null)
+            {
+                settingsContainer.SetActive(true);
+                Debug.Log("PauseMenuManager: Settings container shown.");
+            }
+            else
+            {
+                Debug.LogWarning("PauseMenuManager: settingsContainer is null. Trying to use settingsPanel GameObject.");
+                if (settingsPanel != null && settingsPanel.GetSettingsContainer() != null)
+                {
+                    settingsPanel.GetSettingsContainer().SetActive(true);
+                }
+            }
+            
             settingsPanel.ShowPanel();
         }
         else
